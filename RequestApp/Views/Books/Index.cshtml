@@ -19,28 +19,46 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+    //$(document).ready(function () {
+    //    $.ajax({
+    //        //url: '/Books/GetMyJsonValues',
+    //        url: 'http://localhost:61232/Books/GetMyJsonValues',
+    //        method: 'get',
+    //        dataType: 'json',
+    //        success: function (data) {
+    //            $('#myDT').DataTable({
+    //                data: data,
+    //                columns: [
+    //                    { 'data': 'BookId' },
+    //                    { 'data': 'Description' },
+    //                    {'data': 'ImageUrl',},
+    //                    {'data': 'PublicationYear',},
+    //                    { 'data': 'Publisher' },
+    //                    { 'data': 'Title' },
+    //                    { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-remove\"></span>"}
+    //                ]
+    //            });
+    //        }
+    //    });
+    //});
     $(document).ready(function () {
-        $.ajax({
-            //url: '/Books/GetMyJsonValues',
-            url: 'http://localhost:61232/Books/GetMyJsonValues',
-            method: 'get',
-            dataType: 'json',
-            success: function (data) {
-                $('#myDT').DataTable({
-                    data: data,
-                    columns: [
-                        { 'data': 'BookId' },
-                        { 'data': 'Description' },
-                        {'data': 'ImageUrl',},
-                        {'data': 'PublicationYear',},
-                        { 'data': 'Publisher' },
-                        { 'data': 'Title' },
-                        { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-remove\"></span>"}
-                    ]
-                });
-            }
+        var MyDataTable = $('#myDT').DataTable({
+            ajax: {
+                url: 'http://localhost:61232/Books/GetMyJsonValues',
+                dataSrc: ''
+            },
+            columns: [
+                { 'data': 'BookId' },
+                { 'data': 'Description' },
+                { 'data': 'ImageUrl', },
+                { 'data': 'PublicationYear', },
+                { 'data': 'Publisher' },
+                { 'data': 'Title' },
+                { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-remove\"></span>" }
+            ]
         });
     });
+    
 </script>
 
 <h2>Index</h2>
