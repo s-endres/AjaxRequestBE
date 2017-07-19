@@ -19,7 +19,34 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+    $(document).ready(function(){
+        getData();
+    });
+    function getData() {
+        $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
+            for (var i = 0; i < data.length; i++) {
+                data[i].Buttons = "<span class='glyphicon glyphicon-remove-circle'> | </span><span class='glyphicon glyphicon-ok-circle'></span>";
+            }
+            InitiazilateTable(data);
+        });
+    }
 
+    function InitiazilateTable(data) {
+        $table = $('#myDT').DataTable({
+            "processing": true,
+            "data": data,
+            "columns": [
+                { "data": "BookId" },
+                { "data": "Description" },
+                { "data": "ImageUrl" },
+                { "data": "PublicationYear" },
+                { "data": "Publisher" },
+                { "data": "Title" },
+                { "data": "Buttons" }
+            ],
+            responsive: true
+        });
+    }
 </script>
 
 <h2>Index</h2>
