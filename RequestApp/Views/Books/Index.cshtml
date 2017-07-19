@@ -19,7 +19,37 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+    $(document).ready(function () {
+        $table = $("#myDT").DataTable({
+            responsive: true
+        });
 
+        $.ajax({
+            url: 'http://localhost:61232/Books/GetMyJsonValues',
+            type: 'GET',
+            dataType: "json",
+            success: function (data) {
+                
+                $.each(data, function (index, value) {
+                    var entry = [
+                        value.BookId,
+                        value.Description,
+                        value.ImageUrl,
+                        value.PublicationYear,
+                        value.Publisher,
+                        value.Title,
+                        '<span class=\"glyphicon glyphicon-edit\"data-toggle=\"modal\" data-target=\"#CreateModal\"></span> ' + ' | '
+				            + '<span class=\"glyphicon glyphicon-trash\"data-toggle=\"modal\" data-target=\"#DeleteModal\"></span>'
+                    ];
+                    
+                    $table.row.add(entry).draw();
+                });
+            },
+            error: function () {
+                console.error("ERROR");
+            }
+        });
+    });
 </script>
 
 <h2>Index</h2>
@@ -53,8 +83,7 @@
             </th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 
