@@ -26,9 +26,18 @@
             "columnDefs": [{
                 "targets": 6,
                 "orderable": false
-            }]
+            }],
+            "columns": [
+                { "data": "BookId" },
+                { "data": "Description" },
+                { "data": "ImageUrl" },
+                { "data": "PublicationYear" },
+                { "data": "Publisher" },
+                { "data": "Title" },
+                { "data": "Buttons" }
+            ]
         });
-
+        
         $.ajax({
             url: 'http://localhost:61232/Books/GetMyJsonValues',
             type: 'GET',
@@ -36,17 +45,17 @@
             success: function (data) {
                 
                 $.each(data, function (index, value) {
-                    var entry = [
-                        value.BookId,
-                        value.Description,
-                        value.ImageUrl,
-                        value.PublicationYear,
-                        value.Publisher,
-                        value.Title,
-                        '<span class=\"glyphicon glyphicon-edit\"data-toggle=\"modal\" data-target=\"#CreateModal\"></span> ' + ' | '
+                    var entry = {
+                        BookId:value.BookId,
+                        Description:value.Description,
+                        ImageUrl:value.ImageUrl,
+                        PublicationYear:value.PublicationYear,
+                        Publisher:value.Publisher,
+                        Title:value.Title,
+                        Buttons:'<span class=\"glyphicon glyphicon-edit\"data-toggle=\"modal\" data-target=\"#CreateModal\"></span> ' + ' | '
 				            + '<span class=\"glyphicon glyphicon-trash\"data-toggle=\"modal\" data-target=\"#DeleteModal\"></span>'
-                    ];
-                    
+                    };
+
                     $table.row.add(entry).draw();
                 });
             },
