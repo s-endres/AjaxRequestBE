@@ -59,9 +59,6 @@ namespace RequestApp.Controllers
         }
 
 
-
-
-
          //Metodos importantes a partir de aca 
         [HttpGet]
         public JsonResult GetMyJsonValues()
@@ -84,6 +81,7 @@ namespace RequestApp.Controllers
             }
 
         }
+
         [HttpDelete]
         public JsonResult DeleteBook(int? bookId)
         {
