@@ -19,6 +19,53 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+    
+    /*
+    usar enlace con GET, usar el dato y cargar la table  http://localhost:61232/Books/GetMyJsonValues
+    */
+
+    $(document).ready(function () {
+        $MainTable = $("#myDT").DataTable({
+            responsive: true,
+            "columnDefs":
+		[
+			{
+			    "targets": [6],
+			    "sortable": false
+			}
+
+		]
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/GetMyJsonValues",
+            data: JSON.stringify(),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (JsonData) {
+                console.log(JsonData);
+                $.each(JsonData, function (index, item) {
+                    var NewRow = [item.BookId,
+                                  item.Description,
+                                  item.ImageUrl,
+                                  item.PublicationYear,
+                                  item.Publisher,
+                                  item.Title,
+                                 '<button type="button" class="btn btn-info btn-sm" >Edit</button>' +
+                                 '<button type="button" class="btn btn-info btn-sm editMyRow" onclick="RemoveFromTable(this)">Remove</button>'];
+                    $MainTable.row.add(NewRow).draw();
+
+                });
+
+            },
+            error: function () {
+                console.log("There was an error with the JSON file.")
+            }
+        });
+    });
+
+
 
 </script>
 
