@@ -1,0 +1,141 @@
+﻿@model IEnumerable<RequestApp.Models.Book>
+
+@{
+    ViewBag.Title = "Index";
+}
+<!-- Bootstrap Core CSS -->
+<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- MetisMenu CSS -->
+<link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+<!-- DataTables CSS -->
+<link href="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+<!-- DataTables Responsive CSS -->
+<link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- DataTables JavaScript -->
+<script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
+            var listObj = [];
+            $.each(data,
+                function(index, obj) {
+                    var newObj = {
+                        BookId: obj.BookId,
+                        Description: obj.Description,
+                        ImageUrl: obj.ImageUrl,
+                        PublicationYear: obj.PublicationYear,
+                        Publisher: obj.Publisher,
+                        Title: obj.Title,
+                        htmlButton: "<span class='glyphicon glyphicon-remove-sign'></span> <span> | </span> " +
+                            "<span class='glyphicon glyphicon-ok-sign''></span>"
+                    }
+                    listObj.push(newObj);
+                });
+            setDTWithData(listObj);
+        });
+
+        $('#myDT tbody').on('click', '.glyphicon-remove-sign', function () {
+            var tr = $(this).parents('tr');
+            var index = $Table.row(tr).index();
+            var rowData = $Table.row(index).data();
+
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:61232/Books/DeleteBook",
+                data: JSON.stringify({
+                    bookId: rowData.BookId
+                }),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data) {
+                        console.log(data);
+                    } else {
+                        alert('Wops ERROR O.O" ');
+                    }
+                },
+                error: function () {
+                    alert('Wops ERROR O.O" ');
+                }
+            });
+            //Then we remove the row, without the need to load new data from the server
+           $Table.row(tr).remove().draw();
+        }); // End Remove Event
+
+
+        $('#myDT tbody').on('click', '.glyphicon-ok-sign', function () {
+            var tr = $(this).parents('tr');
+            var index = $Table.row(tr).index();
+            var rowData = $Table.row(index).data();
+            window.location.replace("http://localhost:61232/Books/Edit?bookId=" + rowData.BookId);
+        });
+
+
+    }); // End Document ready
+
+    function setDTWithData(getData) {
+        $Table = $('#myDT').DataTable({
+            "processing": true,
+            "data": getData,
+            "columns": [
+                { "data": "BookId" },
+                { "data": "Description" },
+                { "data": "ImageUrl" },
+                { "data": "PublicationYear" },
+                { "data": "Publisher" },
+                { "data": "Title" },
+                { "data": "htmlButton" }
+            ],
+            responsive: true,
+            "columnDefs": [
+                {
+                    "targets": [6],
+                    "orderable": false
+                }
+            ]
+        });
+    }
+
+</script>
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table id="myDT" class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BookId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PublicationYear)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Publisher)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                <label>Buttons</label>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+

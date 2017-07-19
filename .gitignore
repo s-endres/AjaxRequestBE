@@ -1,0 +1,4 @@
+RequestApp/bin/*
+RequestApp/obj/*
+*.suo
+packages/*
