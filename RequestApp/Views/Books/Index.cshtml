@@ -19,6 +19,29 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+    $(document).ready(function () {
+        $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
+            
+        setData(data); 
+        });
+         
+    });
+
+    function setData(Data) {
+        console.log(Data);
+        $DTable = $('#myDT').DataTable({
+            "data": Data,
+            "columns": [
+                { "data": "BookId" },
+                { "data": "Description" },
+                { "data": "ImageUrl" },
+                { "data": "PublicationYear" },
+                { "data": "Publisher" },
+                { "data": "Title" },
+                { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-remove\"></span>" }
+            ]
+        });
+    }
 
 </script>
 
