@@ -7,40 +7,7 @@
 <h2>Create</h2>
 
 <script>
-    $(document).ready(function () {
-        $("#btnSave").click(function() {
-            doPost();
-        });
-
-    });
-
-    function doPost() {
-        console.log();
-        $.ajax({
-            type: "POST",
-            url: "http://localhost:61232/Books/AddNewBook",
-            data: JSON.stringify({
-                Title: $("#Title").val(),
-                Description: $("#Description").val(),
-                ImageUrl: $("#ImageUrl").val(),
-                Publisher: $("#Publisher").val(),
-                PublicationYear: parseInt($("#PublicationYear").val())
-            }),
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                if (data) {
-                    window.location.replace("http://localhost:61232/Books/");
-                }else
-                {
-                    alert('Wops ERROR O.O" ');
-                }
-            },
-            error: function () {
-                alert('Wops ERROR O.O" ');
-            }
-        });
-    }
+   
 </script>
 
 @using (Html.BeginForm()) 

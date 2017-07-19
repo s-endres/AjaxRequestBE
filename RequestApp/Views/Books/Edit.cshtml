@@ -7,52 +7,7 @@
 <h2>Edit</h2>
 
 <Script>
-
-    $(document).ready(function () {
-        $.urlParam = function (name) {
-            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-            return results[1] || 0;
-        }
-        $.get('http://localhost:61232/Books/getSingleBook?BookId=' + $.urlParam('bookId'), function (data) {
-            $("#BookId").val(data.BookId);
-            $("#Title").val(data.Title);
-            $("#Description").val(data.Description);
-            $("#ImageUrl").val(data.ImageUrl);
-            $("#Publisher").val(data.Publisher);
-            $("#PublicationYear").val(data.PublicationYear);
-        });
-        
-        $("#btnEdit").click(function() {
-            doPut();
-        });
-    }); // End document ready
-
-    function doPut() {
-        $.ajax({
-            type: "PUT",
-            url: "http://localhost:61232/Books/UpdateBook",
-            data: JSON.stringify({
-                BookId: parseInt($("#BookId").val()),
-                Title: $("#Title").val(),
-                Description: $("#Description").val(),
-                ImageUrl: $("#ImageUrl").val(),
-                Publisher: $("#Publisher").val(),
-                PublicationYear: parseInt($("#PublicationYear").val())
-            }),
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                if (data) {
-                    window.location.replace("http://localhost:61232/Books/");
-                } else {
-                    alert('Wops ERROR O.O" ');
-                }
-            },
-            error: function () {
-                alert('Wops ERROR O.O" ');
-            }
-        });
-    }
+    
 </Script>
 
 @using (Html.BeginForm())
