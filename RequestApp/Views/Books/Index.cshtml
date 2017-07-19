@@ -21,7 +21,12 @@
 <script>
     $(document).ready(function () {
         $table = $("#myDT").DataTable({
-            responsive: true
+            responsive: true,
+            "order": [[0, "desc"]],
+            "columnDefs": [{
+                "targets": 6,
+                "orderable": false
+            }]
         });
 
         $.ajax({
