@@ -30,11 +30,11 @@
                         if (data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
-                            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Warning! </strong>No me agregué.</div >');
+                            AddRemove("Alert", "Error");
                         }
                     },
                     error: function () {
-                        $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Warning! </strong>No me agregué.</div >');
+                        AddRemove("Error", "Alert");
                     }
                 });
             }
@@ -52,6 +52,13 @@
             }
         });
         return validation;
+    }
+
+    function AddRemove(idAdd, idRemove) {
+        if (!$("#" + idAdd).length) {
+            $(idRemove).remove();
+            $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>No me agregué.</div >');
+        }
     }
 </script>
 
