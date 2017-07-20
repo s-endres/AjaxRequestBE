@@ -8,37 +8,34 @@
 
 <script>
     $("document").ready(fucntio(){
- 
-        Object =
-            {
-                Title: $("#Title").val(),
-                Description: $("#Description").val(),
-                ImageUrl: $("#ImageUrl").val(),
-                Publisher: $("#Publisher").val(),
-                PublicationYear: $("#PublicationYear").val()
-            };
-        JSonObject = { JSON.stringify(Object) };
 
         $("#btnSave").click(function () {
-            if (ValidateForm())
-            {
+            if (ValidateForm()) {
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
-                    data: JsonObject,
+                    data: JSON.stringify({
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageUrl: $("#ImageUrl").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val()
+                    }),
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
                     success: function (Pdata) {
-                        if (Pdata)
-                        {
-                            $(".form-group").prepend('<div class="alert alert-info">< strong > Dudeee!</strong >Success inserting the data</div >');
-                            $(".alert-info").remove();
+                        if (Pdata) {
+
+                            if (!$('div[class="alert-info"]').length) {
+                                $(".form-group").prepend('<div class="alert alert-info">< strong > Dudeee!</strong >Success inserting the data</div >');
+                            }
                             window.location.replace("http://localhost:61232/Books/");
                         }
-                        else
-                        {
-                            $(".form-group").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed inserting the data</div >')
-                            $(".alert-danger").remove();
+                        else {
+
+                            if (!$('div[class="alert-danger"]').length) {
+                                $(".form-group").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed inserting the data</div >');
+                            }
                         }
                     },
                     error: function () {
@@ -68,10 +65,10 @@
     }
 </style>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -111,7 +108,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control"/>
+                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
