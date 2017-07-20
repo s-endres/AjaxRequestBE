@@ -41,17 +41,18 @@
         $.ajax({
             url: 'http://localhost:61232/Books/GetMyJsonValues',
             type: 'GET',
+            contentType: 'application/json; charset=utf-8',
             dataType: "json",
             success: function (data) {
                 
                 $.each(data, function (index, value) {
                     var entry = {
-                        BookId:value.BookId,
-                        Description:value.Description,
-                        ImageUrl:value.ImageUrl,
-                        PublicationYear:value.PublicationYear,
-                        Publisher:value.Publisher,
-                        Title:value.Title,
+                        BookId:          value.BookId,
+                        Description:     value.Description,
+                        ImageUrl:        value.ImageUrl,
+                        PublicationYear: value.PublicationYear,
+                        Publisher:       value.Publisher,
+                        Title:           value.Title,
                         Buttons:'<span class=\"glyphicon glyphicon-edit\"data-toggle=\"modal\" data-target=\"#CreateModal\"></span> ' + ' | '
 				            + '<span class=\"glyphicon glyphicon-trash\"data-toggle=\"modal\" data-target=\"#DeleteModal\"></span>'
                     };

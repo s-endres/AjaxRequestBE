@@ -7,13 +7,71 @@
 <h2>Create</h2>
 
 <script>
-   
+    function validate() {
+        var flag = true;
+
+        $("div input[type='text']").each(function () {
+            if (!$(this).val().trim()) {
+                AddRemoveClasses($(this).closest("div[class*='form-group']"), "has-error", "has-success");
+                flag = false;
+            } else {
+                AddRemoveClasses($(this).closest("div[class*='form-group']"), "has-success", "has-error");
+            }
+        });
+
+        var NumberInput = $("div input[type='number']");
+        if (!$.isNumeric(NumberInput.val().trim())) {
+            AddRemoveClasses(NumberInput.closest("div[class*='form-group']"), "has-error", "has-success");
+            flag = false;
+        } else {
+            AddRemoveClasses(NumberInput.closest("div[class*='form-group']"), "has-success", "has-error");
+        }
+
+        return flag;
+
+    }
+
+    function AddBook() {
+
+
+        if (validate()) {
+            $.ajax({
+                url: 'http://localhost:61232/Books/AddNewBook',
+                type: 'POST',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    Title: $("#Title").val(),
+                    Description: $("#Description").val(),
+                    ImageUrl: $("#ImageUrl").val(),
+                    Publisher: $("#Publisher").val(),
+                    PublicationYear: parseInt($("#PublicationYear").val())
+                }),
+                dataType: "json",
+                success: function (data) {
+                    if (data) {
+                        window.location.replace("http://localhost:61232/Books/Index");
+                    } else {
+                        if ($("#ServerError").length == 0 ){
+                            $("input[type='button']").parent().prepend("<div id='ServerError' style='margin-bottom:15px'><p class='label label-danger'>The server encountered an error</p></div>");
+                        }
+                    }
+                },
+                error: function () {
+                    console.error("ERROR");
+                }
+            });
+        }
+    }
+
+        function AddRemoveClasses(Element, ClassToAdd, ClassToRemove) {
+            Element.addClass(ClassToAdd).removeClass(ClassToRemove);
+        }
 </script>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -53,14 +111,14 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control"/>
+                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" id="btnSave" value="Create" class="btn btn-default" />
+                <input type="button" id="btnSave" value="Create" class="btn btn-default" onclick="AddBook()" />
             </div>
         </div>
     </div>
