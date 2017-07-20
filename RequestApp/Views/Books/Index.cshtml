@@ -19,6 +19,64 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+$(document).ready(function(){
+        $Table = $("#myDT").DataTable({
+            responsive: true,
+            "columnDefs":
+            [
+                {
+                    "targets":[0,6],
+                    "sortable":false
+                }
+            ]
+        });
+
+
+        $.ajax({
+            type:"GET",
+            url:"http://localhost:61232/Books/GetMyJsonValues",
+            data:"",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                console.log(Data);
+                $.each(Data, function (Index, data) {
+                    var Data2 =
+                        [
+                            data.BookId,
+                            data.Title,
+                            data.Description,
+                            data.ImageUrl,
+                            data.Publisher,
+                            data.PublicationYear,
+                            "<span onclick='DeleteRow((this))' class='glyphicon glyphicon-remove-circle'> |</span>" +
+			                "<span class='glyphicon glyphicon-ok-circle'></span>"
+                        ];
+                    $("#myDT").DataTable()
+                    .row
+                    .add(Data2)
+                    .draw()
+
+
+                });
+  
+            },
+            error: function () {
+
+    
+            }
+        });
+
+});
+
+
+
+
+
+
+
+
+
 
 </script>
 
