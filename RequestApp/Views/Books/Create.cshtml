@@ -39,11 +39,11 @@
                         if (data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
-                            alert("Algo salió mal");
+                            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Warning! </strong>No me agregué.</div >');
                         }
                     },
                     error: function () {
-                        alert("Me caí");
+                        $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Warning! </strong>No me agregué.</div >');
                     }
                 });
             }
