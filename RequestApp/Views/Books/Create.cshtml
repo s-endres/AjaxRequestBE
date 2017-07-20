@@ -7,8 +7,69 @@
 <h2>Create</h2>
 
 <script>
-   
+    function SubmitForm() {
+        $(Alerts).html('');
+        $.ajax({
+            type: 'post',
+            url: 'http://localhost:61232/Books/AddNewBook',
+            data: JSON.stringify({
+                Title: $('#Title').val(),
+                Description: $('#Description').val(),
+                ImageURL: $('#ImageUrl').val(),
+                Publisher: $('#Publisher').val(),
+                PublicationYear: $('#PublicationYear').val()
+            }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function () {
+                $('#Alerts').append("<div class=\"alert alert-success alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>Se agrego el libro " + $('#Title').val() + " satisfactoriamente.</div>");
+            },
+            error: function () {
+                $('#Alerts').append("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>No se pudo agregar el libro.</div>");
+            }
+        });
+    }
+
+    function ValidateForm() {
+        var IsValid = true;
+        $("input[type='text']").each(function () {
+            if (IsEmpty($(this))) {
+                IsValid = false;
+            }
+        });
+        if (!IsNumber($("#PublicationYear"))) {
+            IsValid = false;
+        }
+        if(IsValid){
+            SubmitForm();
+        }
+    }
+
+    function IsEmpty(input){
+        if (input.val().trim() == '') {
+            input.addClass('invalid-input');
+            return true;
+        } else {
+            input.removeClass('invalid-input');
+            return false;
+        }
+    }
+
+    function IsNumber(input) {
+        if ($.isNumeric(input.val())) {
+            input.removeClass('invalid-input');
+            return true;
+        } else {
+            input.addClass('invalid-input');
+            return false;
+        }
+    }
+
 </script>
+
+<div id="Alerts">
+    
+</div>
 
 @using (Html.BeginForm()) 
 {
@@ -60,7 +121,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" id="btnSave" value="Create" class="btn btn-default" />
+                <input type="button" id="btnSave" value="Create" class="btn btn-default" onclick="ValidateForm()"/>
             </div>
         </div>
     </div>
@@ -70,6 +131,7 @@
     @Html.ActionLink("Back to List", "Index")
 </div>
 
-@section Scripts {
+@*@section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-}
+}*@
+
