@@ -22,12 +22,12 @@
     $(document).ready(function () {
         $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
 
-            setData(data);
+            setDataTable(data);
         });
 
     });
 
-    function setData(Data) {
+    function setDataTable(Data) {
         console.log(Data);
         $DTable = $('#myDT').DataTable({
             "data": Data,
@@ -48,6 +48,8 @@
             ]
         });
     }
+
+    
 
 </script>
 
