@@ -13,28 +13,19 @@
 <script>
     $(document).ready(function () {
         $("#btnSave").click(function () {
-            var validation = true;
-            $(".form-control").each(function () {
-                if ($(this).val() == '' || $(this).val() < 0) {
-                    $(this).addClass("Error");
-                    validation = false;
-                } else {
-                    $(this).removeClass("Error");
-                }
-            });
-            if (validation) {
-                var Obj = {
-                    Title: $("#Title").val(),
-                    Description: $("#Description").val(),
-                    ImageUrl: $("#ImageUrl").val(),
-                    Publisher: $("#Publisher").val(),
-                    PublicationYear: $("#PublicationYear").val()
-                }
+            if (Validate()) {
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
                     dataType: "json",
-                    data: Obj,
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageUrl: $("#ImageUrl").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val()
+                    }),
                     success: function (data) {
                         if (data) {
                             window.location.replace("http://localhost:61232/Books/");
@@ -49,6 +40,19 @@
             }
         });
     });
+
+    function Validate() {
+        var validation = true;
+        $(".form-control").each(function () {
+            if ($(this).val() == '' || $(this).val() < 0) {
+                $(this).addClass("Error");
+                validation = false;
+            } else {
+                $(this).removeClass("Error");
+            }
+        });
+        return validation;
+    }
 </script>
 
 @using (Html.BeginForm()) 
