@@ -5,9 +5,50 @@
 }
 
 <h2>Create</h2>
-
+<style>
+    .Error {
+        border: solid 2px red;
+    }
+</style>
 <script>
-   
+    $(document).ready(function () {
+        $("#btnSave").click(function () {
+            var validation = true;
+            $(".form-control").each(function () {
+                if ($(this).val() == '' || $(this).val() < 0) {
+                    $(this).addClass("Error");
+                    validation = false;
+                } else {
+                    $(this).removeClass("Error");
+                }
+            });
+            if (validation) {
+                var Obj = {
+                    Title: $("#Title").val(),
+                    Description: $("#Description").val(),
+                    ImageUrl: $("#ImageUrl").val(),
+                    Publisher: $("#Publisher").val(),
+                    PublicationYear: $("#PublicationYear").val()
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:61232/Books/AddNewBook",
+                    dataType: "json",
+                    data: Obj,
+                    success: function (data) {
+                        if (data) {
+                            window.location.replace("http://localhost:61232/Books/");
+                        } else {
+                            alert("Algo salió mal");
+                        }
+                    },
+                    error: function () {
+                        alert("Me caí");
+                    }
+                });
+            }
+        });
+    });
 </script>
 
 @using (Html.BeginForm()) 
