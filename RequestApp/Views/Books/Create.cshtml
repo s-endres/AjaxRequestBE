@@ -34,7 +34,7 @@
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
                     success: function (Data) {
-                        if (Data) {
+                        if (false) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
                             pError();
@@ -48,8 +48,10 @@
 
         });
         function pError() {
-            $("p").remove(".ErrorClass");
-            $(".form-horizontal").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
+            if (!$("p[class='ErrorClass']").length) {
+                $("p").remove(".ErrorClass");
+                $(".form-horizontal").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
+            } 
         }
 
         function validateMyForm() {
