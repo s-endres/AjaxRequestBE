@@ -8,6 +8,47 @@
 
 <script>
    
+    $(document).ready(function () {
+        $("#btnSave").click(function () {
+            var JsonObj =
+            {
+                Title: $("#Title").val(),
+                Description: $("#Description").val(),
+                ImageUrl: $("#ImageUrl").val(),
+                Publisher: $("#Publisher").val(),
+                PublicationYear: $("#PublicationYear").val()
+            };
+            $.ajax({
+                type: "POST",
+                url: "http://localhost:61232/Books/AddNewBook",
+                data: JSON.stringify(JsonObj),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (JsonData)
+                {
+                    JsonData = false;//This line is for testing, remove to correctly fill form.
+                    if (JsonData == true) {
+                        window.location.replace("http://localhost:61232/Books/");
+                    } else
+                    {
+                        if ($("#ErrorAlert").length == 0) {
+                            var htmlModal1 = '<div id=ErrorAlert class="alert alert-danger">' +
+                                                '<strong>Error!</strong> The request has generated and error, please try again.' +
+                                             '</div>';
+                            $("body").append(htmlModal1);
+                        }
+                    }
+                   
+                },
+                error: function () {
+                    console.log("There was an error with the JSON file.");
+                }
+            });
+
+        });
+    });
+
+
 </script>
 
 @using (Html.BeginForm()) 
