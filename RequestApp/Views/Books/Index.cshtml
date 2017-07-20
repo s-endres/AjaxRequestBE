@@ -19,6 +19,35 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
+    $(document).ready(function () {
+
+        $table = $('#myDT').DataTable({
+            responsive: true,
+            "columnDefs": [{ "targets": [6], "orderable": false }]
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/GetMyJsonValues",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+
+                $.each(data, function (index, item) {
+
+                    var array = [item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\"data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+                    $table.row.add(array).draw();
+                });
+
+            },
+
+            error: function () {
+                alert("stephan te falle :c");
+            }
+
+        });
+    });
 
 </script>
 

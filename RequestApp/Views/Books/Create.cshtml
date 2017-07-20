@@ -7,13 +7,98 @@
 <h2>Create</h2>
 
 <script>
-   
+    $(document).ready(function () {
+
+        $("#btnSave").click(function () {
+            createRow();
+        });
+    });
+
+    function createRow() {
+        if (validateMyForm()) {
+            var obj = {
+
+                Title: $("#Title").val(),
+                Description: $("#Description").val(),
+                ImageUrl: $("#ImageUrl").val(),
+                Publisher: $("#Publisher").val(),
+                PublicationYear: $("#PublicationYear").val()
+
+            }
+            Addrow(obj);
+        }
+
+    }
+
+    function Addrow(obj) {
+
+
+        $.ajax({
+            type: "POST",
+            url: "http://localhost:61232/Books/AddNewBook",
+            data: JSON.stringify(obj),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (false) {
+                    window.location.replace("http://localhost:61232/Books/");
+                }
+                else {
+                    if (!$("p[class='alert alert-warning']").length) {
+                        $(".form-horizontal").append("<p class='alert alert-warning'><strong>Warning!</strong> stephan te falle. </p>");
+                    }
+                }
+
+            },
+
+            error: function () {
+
+                $("p").remove(".class='alert- danger'");
+                $(".form- horizontal").append("<p class='alert alert- danger'><strong>Danger!</strong> stephan te falle. x2 </p>");
+
+
+            }
+
+        });
+    }
+
+    function validateMyForm() {
+        var cellEmpty = true;
+
+        $("input[type='text']").each(function () {
+            if ($(this).val().trim() == "") {
+                changeClass($(this).parent(), "has-success", "has-error");
+                cellEmpty = false;
+            }
+
+            else { changeClass($(this).parent(), "has-error", "has-success"); }
+        });
+
+        $("input[type='number']").each(function () {
+
+            if (!$.isNumeric($(this).val()) || $(this).val() <= 0) {
+
+                changeClass($(this).parent(), "has-success", "has-error");
+                cellEmpty = false;
+            }
+            else { changeClass($(this).parent(), "has-error", "has-success"); }
+
+        });
+
+        return cellEmpty;
+    }
+
+    function changeClass(input, classRemove, classAdd) {
+        input.removeClass(classRemove);
+        input.addClass(classAdd);
+    }
+
 </script>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -53,7 +138,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control"/>
+                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
