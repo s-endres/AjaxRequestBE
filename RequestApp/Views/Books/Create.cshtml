@@ -27,6 +27,7 @@
                         PublicationYear: $("#PublicationYear").val()
                     }),
                     success: function (data) {
+                        data = false;
                         if (data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
@@ -44,7 +45,7 @@
     function Validate() {
         var validation = true;
         $(".form-control").each(function () {
-            if ($(this).val() == '' || $(this).val() < 0) {
+            if ($(this).val().trim() == '' || $(this).val() < 0) {
                 $(this).addClass("Error");
                 validation = false;
             } else {
