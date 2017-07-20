@@ -19,9 +19,8 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
-    var MyDataTable;
     $(document).ready(function () {
-        MyDataTable = $('#myDT').DataTable({
+        $MyDataTable = $('#myDT').DataTable({
             ajax: {
                 url: 'http://localhost:61232/Books/GetMyJsonValues',
                 dataSrc: ''

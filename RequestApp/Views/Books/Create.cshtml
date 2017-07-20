@@ -8,6 +8,7 @@
 
 <script>
     function SubmitForm() {
+        $('.alert').remove();
         $.ajax({
             type: 'post',
             url: 'http://localhost:61232/Books/AddNewBook',
@@ -20,8 +21,12 @@
             }),
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
-            success: function () {
-                window.location = 'http://localhost:61232/Books/'
+            success: function (data) {
+                if (data) {
+                    window.location = 'http://localhost:61232/Books/'
+                } else {
+                    $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>No se pudo agregar el libro.</div>");
+                }
             },
             error: function () {
                 $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>No se pudo agregar el libro.</div>");
