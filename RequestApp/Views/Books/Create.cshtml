@@ -7,8 +7,66 @@
 <h2>Create</h2>
 
 <script>
-   
+    $("document").ready(fucntio(){
+ 
+        Object =
+            {
+                Title: $("#Title").val(),
+                Description: $("#Description").val(),
+                ImageUrl: $("#ImageUrl").val(),
+                Publisher: $("#Publisher").val(),
+                PublicationYear: $("#PublicationYear").val()
+            };
+        JSonObject = { JSON.stringify(Object) };
+
+        $("#btnSave").click(function () {
+            if (ValidateForm())
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "http://localhost:61232/Books/AddNewBook",
+                    data: JsonObject,
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (Pdata) {
+                        if (Pdata)
+                        {
+                            $(".form-group").prepend('<div class="alert alert-info">< strong > Dudeee!</strong >Success inserting the data</div >');
+                            $(".alert-info").remove();
+                            window.location.replace("http://localhost:61232/Books/");
+                        }
+                        else
+                        {
+                            $(".form-group").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed inserting the data</div >')
+                            $(".alert-danger").remove();
+                        }
+                    },
+                    error: function () {
+
+                    }
+                });
+            }
+        })
+    });
+    function ValidateForm() {
+        var Error = true;
+        $(".form-control").not("#hidden").each(function () {
+            if ($(this).val().trim() == "" || $(this).val() < 0) {
+                $(this).addClass("Error");
+                Error = false;
+            }
+            else {
+                $(this).removeClass("Error");
+            }
+        });
+        return Error;
+    }
 </script>
+<style>
+    .Error {
+        border: solid 1px red;
+    }
+</style>
 
 @using (Html.BeginForm()) 
 {
