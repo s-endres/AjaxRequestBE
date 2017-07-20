@@ -27,7 +27,6 @@
                         PublicationYear: $("#PublicationYear").val()
                     }),
                     success: function (data) {
-                        data = false;
                         if (data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
