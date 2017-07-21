@@ -5,9 +5,104 @@
 }
 
 <h2>Edit</h2>
-
+<style>
+    .background-color {
+        background-color: #FED9D9;
+    }
+</style>
 <Script>
-    
+    $(document).ready(function () {
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
+        var CurrentBookID = ($.urlParam("BookID"));
+        FillForm(CurrentBookID);
+        $("#btnEdit").click(function () {
+            if (ValidateForm() == true) {
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:61232/Books/UpdateBook",
+                    data: JSON.stringify({
+                        BookId: CurrentBookID,
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageUrl: $("#ImageUrl").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val()
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (JsonData) {
+                        if (JsonData) {
+                            window.location.replace("http://localhost:61232/Books/Index");
+
+                        } else {
+                            ErrorAlert();
+                        }
+
+                    },
+                    error: function () {
+                        ErrorAlert();
+                    }
+                });
+            }
+            
+        });
+
+
+    });
+
+    function FillForm(CurrentBookID)
+    {
+        $.ajax({
+            type: "GET",
+            url: " http://localhost:61232/Books/getSingleBook",
+            data: { BookId: CurrentBookID },
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (JsonData) {
+                if (!JsonData)  {
+                    ErrorAlert();
+
+                } else {
+                    $("#Title").val(JsonData.Title);
+                    $("#Description").val(JsonData.Description);
+                    $("#ImageUrl").val(JsonData.ImageUrl);
+                    $("#Publisher").val(JsonData.Publisher);
+                    $("#PublicationYear").val(JsonData.PublicationYear);
+                }
+
+            },
+            error: function () {
+                ErrorAlert();
+            }
+        });
+    }
+    function ValidateForm() {
+        var SpaceCheck = true;
+        $(".form-control").each(function () {
+            if ($(this).val().trim() == "" || $(this).val() < 0) {
+                SpaceCheck = false;
+                $(this).addClass("background-color");
+            } else {
+                $(this).removeClass("background-color");
+            }
+        }
+
+        );
+        return SpaceCheck;
+    }
+   
+    function ErrorAlert() {
+        if ($("#ErrorAlert").length == 0) {
+            var htmlModal1 = '<div id=ErrorAlert class="alert alert-danger">' +
+                                '<strong>Error!</strong> The request could not be processed correctly, please try again.' +
+                             '</div>';
+            $("body").append(htmlModal1);
+        }
+    }
+
 </Script>
 
 @using (Html.BeginForm())

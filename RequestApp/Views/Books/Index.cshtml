@@ -52,8 +52,8 @@
                                   item.PublicationYear,
                                   item.Publisher,
                                   item.Title,
-                                 '<button type="button" class="btn btn-info btn-sm" >Edit</button>' +
-                                 '<button type="button" class="btn btn-info btn-sm editMyRow" onclick="RemoveModal(this)">Remove</button>'];
+                                 '<button type="button" class="btn btn-info btn-sm" onclick="GoToEdit(this)" >Edit</button>' +
+                                 '<button type="button" class="btn btn-info btn-sm" onclick="RemoveModal(this)">Remove</button>'];
                     $MainTable.row.add(NewRow).draw();
 
                 });
@@ -78,7 +78,7 @@
         var RowIndex = $("#StoredIndex").val();
         $.ajax({
             type: "DELETE",
-            url: "http://localhost:61232/Books/DeleteBook",
+            url: "http://localhost:61232/Books/DeleteBok",
             data: JSON.stringify({ bookId: $MainTable.row(RowIndex).data()[0] }),
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
@@ -98,6 +98,17 @@
         });
 
     }
+
+    function GoToEdit(button)
+    {
+        $("#StoredIndex").val($(button).parents("tr").index());
+        var ID =  $MainTable.row($("#StoredIndex").val()).data()[0] ;
+        window.location.replace("http://localhost:61232/Books/Edit?BookID=" + ID);
+    }
+
+
+
+
     function ErrorAlert() {
 
         if ($("#ErrorAlert").length == 0) {
@@ -107,7 +118,7 @@
             $("body").prepend(htmlModal1).animate({ scrollTop: 0 }, "slow");
 
         } else {
-            $("#body").animate({ scrollTop: 0 }, "slow");
+            $("body").animate({ scrollTop: 0 }, "slow");
         }
     }
 
