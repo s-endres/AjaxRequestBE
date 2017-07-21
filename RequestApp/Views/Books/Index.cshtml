@@ -25,10 +25,46 @@
             setDataTable(data);
         });
 
+        $('#myDT tbody').on('click', '.glyphicon-trash', function () {
+            $("#myModal").modal();
+            var RowHTML = $(this).parents('tr');
+            $("#hiddenInput").val($DTable.row(RowHTML).index());
+        });
+
+        $('#deleteBtn').on('click', function () {
+            var ObjP = {
+                bookId: $DTable.row($("#hiddenInput").val()).data().BookId
+            }
+
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:61232/Books/DeleteBook",
+                data: JSON.stringify(ObjP),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (Data) {
+                    if (Data) {
+                        $DTable.row($("#hiddenInput").val()).remove().draw();
+                    } else {
+                        pError();
+                    }
+                },
+                error: function () {
+                    pError();
+                }
+            });
+
+        });
+
     });
 
+    function pError() {
+        if (!$("p[class='ErrorClass']").length) {
+            $("tbody").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
+        }
+    }
+
     function setDataTable(Data) {
-        console.log(Data);
         $DTable = $('#myDT').DataTable({
             "data": Data,
             "columns": [
@@ -38,7 +74,7 @@
                 { "data": "PublicationYear" },
                 { "data": "Publisher" },
                 { "data": "Title" },
-                { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-remove\"></span>" }
+                { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-trash data-toggle=\"modal\" data-target=\"#myModal\"></span>" }
             ],
             "columnDefs": [
                 {
@@ -47,9 +83,9 @@
                 }
             ]
         });
-    }
 
-    
+
+    }
 
 </script>
 
@@ -58,6 +94,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
 <table id="myDT" class="table">
     <thead>
         <tr>
@@ -86,5 +123,29 @@
     </thead>
     <tbody></tbody>
 </table>
+
+<div>
+    <div class="modal fade" id="myModal" role="checkbox">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Delete Confirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Sure you want to delete?</p>
+                    <input type="text" class="form-control" style="display:none" id="hiddenInput">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" id="deleteBtn" data-dismiss="modal">Delete</button>
+                    <button type="button" class="btn btn-default pull-left" id="cancelBtn" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 
