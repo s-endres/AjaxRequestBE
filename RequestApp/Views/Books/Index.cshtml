@@ -21,7 +21,6 @@
 <script>
     $(document).ready(function () {
         $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
-
             setDataTable(data);
         });
 
@@ -32,16 +31,19 @@
         });
 
         $('#deleteBtn').on('click', function () {
-             
-            $.ajax({
+            var rowIndex = $("#hiddenInput").val();
+            
+                $.ajax({
                 type: "DELETE",
                 url: "http://localhost:61232/Books/DeleteBook",
-                data: JSON.stringify(ObjP={bookId: $DTable.row($("#hiddenInput").val()).data().BookId}),
+                data: JSON.stringify({
+                    bookId: $DTable.row(rowIndex).data().BookId
+                }),
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
                 success: function (Data) {
                     if (Data) {
-                        $DTable.row($("#hiddenInput").val()).remove().draw();
+                        $DTable.row(rowIndex).remove().draw();
                     } else {
                         pError();
                     }
@@ -52,6 +54,12 @@
             });
 
         });
+
+        $('#myDT tbody').on('click', '.glyphicon-edit', function () {
+            
+            var Input=$DTable.row($(this).parents('tr')).index();
+            window.location.href = 'http://localhost:61232/Books/Edit?BookId=' + $DTable.row(Input).data().BookId;
+        })
 
     });
 

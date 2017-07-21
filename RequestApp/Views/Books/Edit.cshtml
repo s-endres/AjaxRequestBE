@@ -7,13 +7,111 @@
 <h2>Edit</h2>
 
 <Script>
-    
+    $(document).ready(function () {
+
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/GetSingleBook",
+            data: ({
+                BookId: $.urlParam('BookId')
+            }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                if (Data) {
+                    $("#BookId").val(Data.BookId);
+                    $("#Title").val(Data.Title);
+                    $("#Description").val(Data.Description);
+                    $("#ImageUrl").val(Data.ImageUrl);
+                    $("#Publisher").val(Data.Publisher);
+                    $("#PublicationYear").val(Data.PublicationYear); 
+                } else {
+                    pError();
+                }
+            },
+            error: function () {
+                pError();
+            }
+        });
+
+        $('#btnEdit').on('click', function () {
+
+            if (validateMyForm()) {
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:61232/Books/UpdateBook",
+                    data: JSON.stringify({
+                        BookId: $("#BookId").val(),
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageUrl: $("#ImageUrl").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val()
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (Data) {
+                        if (Data) {
+                            window.location.href = 'http://localhost:61232/Books/Index';
+                        } else {
+                            pError();
+                        }
+                    },
+                    error: function () {
+                        pError();
+                    }
+                });
+            }
+
+        });
+    });
+     
+    function pError() {
+        if (!$("p[class='ErrorClass']").length) {
+            $(".form-horizontal").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
+        }
+    }
+
+    function validateMyForm() {
+        var flag = true;
+        $("input[type='text']").each(function () {
+            if ($(this).val().trim() == "") {
+                SwapClass($(this).parent(), "has-success", "has-error");
+                flag = false;
+            } else {
+                SwapClass($(this).parent(), "has-error", "has-success");
+            }
+
+        })
+
+        $("input[type='number']").each(function () {
+            console.log($(this).val());
+            if ($(this).val().trim() == "" || $(this).val() <= 0) {
+                SwapClass($(this).parent(), "has-success", "has-error");
+                flag = false;
+            } else {
+                SwapClass($(this).parent(), "has-error", "has-success");
+            }
+
+        });
+        return flag;
+    }
+    function SwapClass(ThisText, ClassR, ClassA) {
+        $(ThisText).removeClass(ClassR);
+        $(ThisText).addClass(ClassA);
+    }
+
 </Script>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -62,7 +160,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="Save" class="btn btn-default" id="btnEdit"/>
+                <input type="button" value="Save" class="btn btn-default" id="btnEdit" />
             </div>
         </div>
     </div>
