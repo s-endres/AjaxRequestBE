@@ -19,7 +19,7 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
-    $(document).ready(fucntion(){
+    $(document).ready(function () {
 
         $Table = $("#myDT").DataTable({
             responsive: true,
@@ -31,83 +31,81 @@
                 }
             ]
         });
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/GetMyJsonValues",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (pData) {
+                $.each(pData, function (Index, pArray) {
+                    var Data =
+                        [
+                            pArray.BookId,
+                            pArray.Description,
+                            pArray.ImageUrl,
+                            pArray.PublicationYear,
+                            pArray.Publisher,
+                            pArray.Title,
+                            "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
+                            "<span class='glyphicon glyphicon-ok-circle'></span>"
+                        ];
+                    $Table
+                        .row
+                        .add(Data)
+                        .draw()
+                });
+            },
+            error: function () {
+                alert("Oscar se la come toda");
+            }
+        });
 
+        $(document).on("click", ".glyphicon-remove-circle", function () {
 
-            $(document).on("click", "gliphycon-remove-circle", function(){
-            
-                var Row = $(this).parents("tr");
-                var Index = $Table
-                .row(Row)
-                .index();
-                $("#hidden").val(Index); 
-                $("#myModal").modal();
-            });
-            $("#DeleteRow").click(function(){
-                $.ajax({
-                    type:"DELETE",
-                    url: "http://localhost:61232/Books/DeleteBook",
-                    data: $Table.row(Index).data()[0],
-                    dataType: "json",
-                    contentType: 'application/json; charset=utf-8',
-                    success: function (Data) {
-                        if(Data)
-                        {
-                            $Table.row(Index).remove().draw();
-                        }
-                        else
-                        {
-                            if (!$('div[class="alert-danger"]').length) {
-                                $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed deleting the row ToT</div >');
-                            }
-                        }
-                           
-
-                    },
-                    error: function () {
-                        if (!$('div[class="alert-danger"]').length) {
-                            $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
-                        }
-                    }
-            });
+            var Row = $(this).parents("tr");
+            var Index = $Table
+            .row(Row)
+            .index();
+            $("#hidden").val(Index);
+            $("#myModal").modal();
+        });
 
     });
-    $.ajax({
-        type: "GET",
-        url: "http://localhost:61232/Books/GetMyJsonValues",
-        data:"",
-        dataType: "json",
-        contentType: 'application/json; charset=utf-8',
-        success: function (pData) {
-            $.each(pData, function (Index, pArray) {
-                var Data =
-                    [
-                        pArray.BookId,
-                        pArray.Description,
-                        pArray.ImageUrl,
-                        pArray.PublicationYear,
-                        pArray.Publisher,
-                        pArray.Title,
-                        "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
-                        "<span class='glyphicon glyphicon-ok-circle'></span>"
-                    ];
-                $Table
-                    .row
-                    .add(Data)
-                    .draw()
-            });
-        },
-        error: function () {
-            alert("Oscar se la come toda");
+
+    $("#DeleteRow").click(function () {
+        var Index = $("#hidden").val();
+
+        $.ajax({
+            type: "DELETE",
+            url: "http://localhost:61232/Books/DeleteBook",
+            data: JSON.stringify({ Row: $Table.row(Index).data()[0] }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                if (Data) {
+                    $Table.row(Index).remove().draw();
+                }
+                else {
+                    if (!$('div[class="alert-danger"]').length) {
+                        $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed deleting the row ToT</div >');
+                    }
+                }
+
+
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });
+
+
+    });
+    function WarningMessage() {
+        if (!$('div[class="alert-danger"]').length) {
+            $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
         }
-
-
-    
-
-
-
-
-
-
+    }
 
 </script>
 <style>
@@ -118,7 +116,6 @@
     #hidden {
         display: none;
     }
-
 </style>
 <h2>Index</h2>
 
