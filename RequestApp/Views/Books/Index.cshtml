@@ -53,7 +53,7 @@
                                   item.Publisher,
                                   item.Title,
                                  '<button type="button" class="btn btn-info btn-sm" >Edit</button>' +
-                                 '<button type="button" class="btn btn-info btn-sm editMyRow" onclick="RemoveFromTable(this)">Remove</button>'];
+                                 '<button type="button" class="btn btn-info btn-sm editMyRow" onclick="RemoveModal(this)">Remove</button>'];
                     $MainTable.row.add(NewRow).draw();
 
                 });
@@ -64,7 +64,54 @@
             }
         });
     });
+    
+    function RemoveModal(button)
+    {
+        
+        $("#ConfirmationModal").modal();
+        $("#StoredIndex").val($(button).parents("tr").index());
+            
+    }
 
+    function RemoveFromTable()
+    {
+        
+        $.ajax({
+            type: "DELETE",
+            url: "http://localhost:61232/Books/DeleteBook",
+            data: JSON.stringify({ bookId: $MainTable.row($("#StoredIndex").val()).data()[0] }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (JsonData) {
+                if (JsonData == true) {
+                    $MainTable.DataTable().row($("#StoredIndex").val()).remove().draw();
+                } else {
+                    ErrorAlert();
+                }
+
+            },
+            error: function ()
+            {
+                ErrorAlert();
+            }
+    
+        });
+
+    }
+    function ErrorAlert() {
+
+        if ($("#ErrorAlert").length == 0) {
+            var htmlModal1 = '<div id=ErrorAlert class="alert alert-danger">' +
+                                '<strong>Error!</strong> The request could not be processed correctly, please try again.' +
+                             '</div>';
+            $("body").prepend(htmlModal1).animate({ scrollTop: 0 }, "slow");
+
+        } else {
+            $("body").animate({ scrollTop: 0 }, "slow");
+        }
+    }
+
+    
 
 
 </script>
@@ -103,5 +150,27 @@
     <tbody>
     </tbody>
 </table>
+<div class="modal fade" id="ConfirmationModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you wish to delete this row?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal" onclick="RemoveFromTable()"  >Yes</button>
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">No</button>
+                <label id="StoredIndex" style="display:none"></label>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
 
 
