@@ -97,10 +97,14 @@
 
     function AddRemove(idAdd, idRemove, Text) {
         if (!$("#" + idAdd).length) {
-            $(idRemove).remove();
+            $("#" + idRemove).remove();
             $("#myDT").before('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>' + Text + '</div >');
         }
     }
+
+    $(document).on("click", ".glyphicon-ok-circle", function () {
+        window.location.replace("http://localhost:61232/Books/Edit?bookId=" + $table.row($(this).parents("tr")).data().BookId);
+    });
 </script>
 
 <h2>Index</h2>

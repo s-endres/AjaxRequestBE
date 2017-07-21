@@ -5,9 +5,89 @@
 }
 
 <h2>Edit</h2>
-
+<style>
+    .Error {
+        border: solid 2px red;
+    }
+</style>
 <Script>
-    
+    $(document).ready(function () {
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getSingleBook",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            data: { bookId: parseInt($.urlParam("bookId")) },
+            success: function (data) {
+                if (data === false) {
+                    window.location.replace("http://localhost:61232/Books/");
+                } else {
+                    $("#Title").val(data.Title);
+                    $("#Description").val(data.Description);
+                    $("#ImageUrl").val(data.ImageUrl);
+                    $("#Publisher").val(data.Publisher);
+                    $("#PublicationYear").val(data.PublicationYear);
+                }
+            },
+            error: function () {
+                window.location.replace("http://localhost:61232/Books/");
+            }
+        });
+
+        $("#btnEdit").click(function () {
+            if (Validate()) {
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:61232/Books/UpdateBook",
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify({
+                        BookId: parseInt($.urlParam("bookId")),
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageUrl: $("#ImageUrl").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val()
+                    }),
+                    success: function (data) {
+                        if (data) {
+                            window.location.replace("http://localhost:61232/Books/");
+                        } else {
+                            AddRemove("Alert", "Error", "No me edité");
+                        }
+                    },
+                    error: function () {
+                        AddRemove("Error", "Alert", "Me caí");
+                    }
+                });
+            }
+        });
+    });
+
+    function Validate() {
+        var validation = true;
+        $(".form-control").each(function () {
+            if ($(this).val().trim() == '' || $(this).val() < 0) {
+                $(this).addClass("Error");
+                validation = false;
+            } else {
+                $(this).removeClass("Error");
+            }
+        });
+        return validation;
+    }
+
+    function AddRemove(idAdd, idRemove, Text) {
+        if (!$("#" + idAdd).length) {
+            $("#" + idRemove).remove();
+            $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>' + Text + '</div >');
+        }
+    }
 </Script>
 
 @using (Html.BeginForm())

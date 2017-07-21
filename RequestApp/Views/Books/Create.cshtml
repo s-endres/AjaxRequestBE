@@ -56,7 +56,7 @@
 
     function AddRemove(idAdd, idRemove) {
         if (!$("#" + idAdd).length) {
-            $(idRemove).remove();
+            $("#" + idRemove).remove();
             $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>No me agregué.</div >');
         }
     }
