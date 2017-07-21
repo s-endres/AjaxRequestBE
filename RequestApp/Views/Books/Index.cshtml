@@ -101,9 +101,7 @@
 
     function GoToEdit(button)
     {
-        $("#StoredIndex").val($(button).parents("tr").index());
-        var ID =  $MainTable.row($("#StoredIndex").val()).data()[0] ;
-        window.location.replace("http://localhost:61232/Books/Edit?BookID=" + ID);
+        window.location.replace("http://localhost:61232/Books/Edit?BookID=" + $MainTable.row($(button).parents("tr").index()).data()[0]);
     }
 
 
