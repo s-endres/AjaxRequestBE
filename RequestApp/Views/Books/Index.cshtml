@@ -18,10 +18,45 @@
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
+<style>
+    #hidden {
+        display: none;
+    }
+
+    .glyphicon:hover {
+        cursor: pointer;
+    }
+</style>
+
 <script>
     $(document).ready(function(){
         getData();
+
+        $("#btnDelete").click(function () {
+            $("#modalDelete").modal("toggle");
+            var Index = $table.row($("#hidden").val());
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:61232/Books/DeleteBook",
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({
+                    bookId: Index.data().BookId
+                }),
+                success: function (data) {
+                    if (data) {
+                        Index.remove().draw();
+                    } else {
+                        AddRemove("Alert", "Error", "No me borré");
+                    }
+                },
+                error: function () {
+                    AddRemove("Error", "Alert", "Me caí");
+                }
+            });
+        });
     });
+
     function getData() {
         $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
             for (var i = 0; i < data.length; i++) {
@@ -52,6 +87,19 @@
                 }
             ]
         });
+    }
+
+    $(document).on("click", ".glyphicon-remove-circle", function () {
+        var Parent = $(this).parents("tr");
+        $("#hidden").val($table.row(Parent).index());
+        $("#modalDelete").modal('show');
+    });
+
+    function AddRemove(idAdd, idRemove, Text) {
+        if (!$("#" + idAdd).length) {
+            $(idRemove).remove();
+            $("#myDT").before('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>' + Text + '</div >');
+        }
     }
 </script>
 
@@ -91,3 +139,24 @@
 </table>
 
 
+<div id="modalDelete" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Delete</h4>
+            </div>
+            <div class="modal-body">
+                <p>Do you really want to delete this?<p>
+                <input type="text" class="form-control" id="hidden">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-default" id="btnDelete">Delete</button>
+            </div>
+            <div class="modal-footer">
+                
+            </div>
+        </div>
+
+    </div>
+</div>
