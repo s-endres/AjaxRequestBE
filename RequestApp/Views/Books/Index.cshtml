@@ -44,7 +44,7 @@
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
             success: function (JsonData) {
-                console.log(JsonData);
+                
                 $.each(JsonData, function (index, item) {
                     var NewRow = [item.BookId,
                                   item.Description,
@@ -75,16 +75,16 @@
 
     function RemoveFromTable()
     {
-        
+        var RowIndex = $("#StoredIndex").val();
         $.ajax({
             type: "DELETE",
             url: "http://localhost:61232/Books/DeleteBook",
-            data: JSON.stringify({ bookId: $MainTable.row($("#StoredIndex").val()).data()[0] }),
+            data: JSON.stringify({ bookId: $MainTable.row(RowIndex).data()[0] }),
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
             success: function (JsonData) {
-                if (JsonData == true) {
-                    $MainTable.DataTable().row($("#StoredIndex").val()).remove().draw();
+                if (JsonData) {
+                    $MainTable.row(RowIndex).remove().draw();
                 } else {
                     ErrorAlert();
                 }
@@ -107,7 +107,7 @@
             $("body").prepend(htmlModal1).animate({ scrollTop: 0 }, "slow");
 
         } else {
-            $("body").animate({ scrollTop: 0 }, "slow");
+            $("#body").animate({ scrollTop: 0 }, "slow");
         }
     }
 
@@ -170,7 +170,7 @@
     </div>
 </div>
 
-</div>
+
 
 
 
