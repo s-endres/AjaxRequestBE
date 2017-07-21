@@ -47,11 +47,70 @@
             }
 
         });
+
+
     });
+
+    function removeRow(bottom) {
+
+        var actualRow = $(bottom).parents("tr");
+        deleteForm(actualRow);
+        $('#exampleModal').modal('show');
+
+    }
+
+
+    function deleteForm(ActualRow) {
+
+        console.log(ActualRow);
+        var rowIndex = $('#myDT').DataTable().row(ActualRow).index();
+        var row = $('#myDT').DataTable().row(rowIndex).data()
+        console.log(row[0])
+        $("#yesDelete").click(function () {
+            $.ajax({
+                type: "DELETE",
+                url:" http://localhost:61232/Books/DeleteBook" ,
+                data: JSON.stringify({BookId:row[0]}),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    
+                    if (data) {
+
+                        $('#myDT').DataTable().row(ActualRow).remove().draw();
+                        ValidateMyAlert("Class='alert alert-success'", ' Complete', 'Success')
+
+                    }
+
+                    else {
+                        ValidateMyAlert("Class='alert alert-warning'", ' no se pudo eliminar :( ', 'Warning')
+                    }
+
+                },
+
+                error: function () {
+                    ValidateMyAlert("Class='alert alert-danger'", 'stephan te falle. x2', 'Danger')
+                }
+
+            });
+
+            $("#closeDeleteModal").click();
+        })
+    }
+
+    function ValidateMyAlert(pClass, pString, tMessege) {
+
+        if (!$("p[" + pClass + "]").length) {
+            $("p[class='alert']").remove();
+            $("#alertContainer").append("<p " + pClass + "><strong>" + tMessege + "</strong> " + pString + " </p>");
+        }
+
+    }
 
 </script>
 
 <h2>Index</h2>
+<div id="alertContainer"></div>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -86,4 +145,22 @@
     </tbody>
 </table>
 
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="titleModelDelete">Delete</h4>
+            </div>
+            <div id="rowModalBody" class="modal-body">
+                <label for="usr">Are you sure you want to delete a row</label><br>
+                <button type="button" class="btn btn-default" id="yesDelete">yes</button>
+                <button type="button" class="btn btn-default" id="noDelete" data-dismiss="modal">No</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="closeDeleteModal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 

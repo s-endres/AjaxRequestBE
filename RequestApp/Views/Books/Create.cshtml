@@ -40,26 +40,29 @@
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                if (false) {
+                if (data) {
                     window.location.replace("http://localhost:61232/Books/");
                 }
                 else {
-                    if (!$("p[class='alert alert-warning']").length) {
-                        $(".form-horizontal").append("<p class='alert alert-warning'><strong>Warning!</strong> stephan te falle. </p>");
-                    }
+                    ValidateMyAlert("Class='alert alert-warning'", 'stephan te falle :c', 'Warning')           
                 }
 
             },
 
             error: function () {
-
-                $("p").remove(".class='alert- danger'");
-                $(".form- horizontal").append("<p class='alert alert- danger'><strong>Danger!</strong> stephan te falle. x2 </p>");
-
-
+                ValidateMyAlert("Class='alert alert-danger'", 'stephan te falle. x2', 'Danger')
             }
 
         });
+    }
+
+    function ValidateMyAlert(pClass, pString, tMessege) {
+
+        if (!$("p["+ pClass + "]").length) {
+            $("p[class='alert']").remove();
+            $(".form-horizontal").append("<p "+pClass+"><strong>"+tMessege+"</strong> "+pString+" </p>");
+        }
+
     }
 
     function validateMyForm() {
