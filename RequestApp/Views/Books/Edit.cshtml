@@ -7,13 +7,103 @@
 <h2>Edit</h2>
 
 <Script>
-    
+    $(document).ready(function () {
+
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            if (results == null) {
+                return null;
+            }
+            else {
+                return results[1] || -1;
+            }
+        }
+
+        var bookId = parseInt($.urlParam("BookId"));
+
+        if (isNaN(bookId) || bookId == -1) {
+            window.location.replace("http://localhost:61232/Books/Index");
+        } else {
+            $.ajax({
+                url: 'http://localhost:61232/Books/getSingleBook',
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                data: { bookId: bookId },
+                dataType: "json",
+                success: function (data) {
+                    $("#Title").val(data.Title);
+                    $("#Description").val(data.Description);
+                    $("#ImageUrl").val(data.ImageUrl);
+                    $("#Publisher").val(data.Publisher);
+                    $("#PublicationYear").val(data.PublicationYear);
+                    $("#BookId").val(data.BookId);
+                }
+            });
+        }
+    });
+
+    function validate() {
+        var flag = true;
+
+        $("div input[type='text']").each(function () {
+            if (!$(this).val().trim()) {
+                AddRemoveClasses($(this).closest("div[class*='form-group']"), "has-error", "has-success");
+                flag = false;
+            } else {
+                AddRemoveClasses($(this).closest("div[class*='form-group']"), "has-success", "has-error");
+            }
+        });
+
+        var NumberInput = $("div input[type='number']");
+        if (!$.isNumeric(NumberInput.val().trim())) {
+            AddRemoveClasses(NumberInput.closest("div[class*='form-group']"), "has-error", "has-success");
+            flag = false;
+        } else {
+            AddRemoveClasses(NumberInput.closest("div[class*='form-group']"), "has-success", "has-error");
+        }
+
+        return flag;
+
+    }
+
+    function AddRemoveClasses(Element, ClassToAdd, ClassToRemove) {
+        Element.addClass(ClassToAdd).removeClass(ClassToRemove);
+    }
+
+    function EditBook() {
+        if (validate()) {
+            $.ajax({
+                url: "http://localhost:61232/Books/UpdateBook",
+                type: "PUT",
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                data: JSON.stringify({
+                    Title: $("#Title").val(),
+                    Description: $("#Description").val(),
+                    ImageUrl: $("#ImageUrl").val(),
+                    Publisher: $("#Publisher").val(),
+                    PublicationYear: parseInt($("#PublicationYear").val()),
+                    BookId: parseInt($("#BookId").val())
+                }),
+                success: function (data) {
+                    if (data) {
+                        window.location.replace("http://localhost:61232/Books/Index"); 
+                    } else {
+                        if ($("#ServerError").length == 0) {
+                            $("input[type='button']").parent().prepend("<div id='ServerError' style='margin-bottom:15px'><p class='label label-danger'>The server encountered an error</p></div>");
+                        }
+                    }
+                }
+            });
+        }
+    }
+
 </Script>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -62,7 +152,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="Save" class="btn btn-default" id="btnEdit"/>
+                <input type="button" value="Save" class="btn btn-default" id="btnEdit" onclick="EditBook()"/>
             </div>
         </div>
     </div>

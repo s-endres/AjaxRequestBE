@@ -3,8 +3,6 @@
 @{
     ViewBag.Title = "Index";
 }
-<!-- Bootstrap Core CSS -->
-<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 <!-- MetisMenu CSS -->
 <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 <!-- DataTables CSS -->
@@ -13,7 +11,6 @@
 <link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
 <!-- Custom Fonts -->
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
@@ -37,24 +34,23 @@
                 { "data": "Buttons" }
             ]
         });
-        
+
         $.ajax({
             url: 'http://localhost:61232/Books/GetMyJsonValues',
             type: 'GET',
             contentType: 'application/json; charset=utf-8',
             dataType: "json",
             success: function (data) {
-                
                 $.each(data, function (index, value) {
                     var entry = {
-                        BookId:          value.BookId,
-                        Description:     value.Description,
-                        ImageUrl:        value.ImageUrl,
+                        BookId: value.BookId,
+                        Description: value.Description,
+                        ImageUrl: value.ImageUrl,
                         PublicationYear: value.PublicationYear,
-                        Publisher:       value.Publisher,
-                        Title:           value.Title,
-                        Buttons:'<span class=\"glyphicon glyphicon-edit\"data-toggle=\"modal\" data-target=\"#CreateModal\"></span> ' + ' | '
-				            + '<span class=\"glyphicon glyphicon-trash\"data-toggle=\"modal\" data-target=\"#DeleteModal\"></span>'
+                        Publisher: value.Publisher,
+                        Title: value.Title,
+                        Buttons: '<span class="glyphicon glyphicon-edit"></span> ' + ' | '
+				            + '<span class="glyphicon glyphicon-trash"data-toggle="modal" data-target="#DeleteModal"></span>'
                     };
 
                     $table.row.add(entry).draw();
@@ -64,7 +60,53 @@
                 console.error("ERROR");
             }
         });
+
+        $(document).on("click", ".glyphicon-edit", function () {
+            var Book = getBookId($(this));
+            window.location.replace("http://localhost:61232/Books/Edit?BookId=" + Book.BookId);
+        });
+
+        $(document).on("click", ".glyphicon-trash", function () {
+            var Book = getBookId($(this));
+
+            $("#IdDeleter").val(Book.BookId);
+            $("#IdRow").val($table.row($(this).closest("tr")).index());
+
+            $("#TitleModal").text(Book.Title);
+            $("#PublisherModal").text(Book.Publisher);
+            $("#PublicationYearModal").text(Book.PublicationYear);
+            $("#DescriptionModal").text(Book.Description);
+
+        });
     });
+
+    function getBookId(cell) {
+        return $table.row(cell.closest("tr")).data();
+    }
+
+    function DeleteRow() {
+        var pbookId = $("#IdDeleter").val();
+
+        $.ajax({
+            url: 'http://localhost:61232/Books/DeleteBook',
+            type: 'DELETE',
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json",
+            data: JSON.stringify({
+                bookId: parseInt(pbookId)
+            }),
+            success: function (data) {
+                $table.row($("#IdRow").val()).remove().draw();
+
+                $('#DeleteModal').modal('toggle');
+                $('body').removeClass('modal-open');
+            },
+            error: function () {
+                console.error("ERROR");
+            }
+        });
+    }
+
 </script>
 
 <h2>Index</h2>
@@ -100,5 +142,41 @@
     </thead>
     <tbody></tbody>
 </table>
+
+<!-- Delete modal -->
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myDeleteLabel">Do you really want to delete this book?</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input id="IdDeleter" type="hidden" class="form-control" disabled>
+                    <input id="IdRow" type="hidden" class="form-control" disabled>
+                    <div class="form-group">
+                        <label>Title: </label>
+                        <p id="TitleModal"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Publisher: </label>
+                        <p id="PublisherModal"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>PublicationYear: </label>
+                        <p id="PublicationYearModal"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>Description: </label>
+                        <p id="DescriptionModal"></p>
+                    </div>
+                </form>
+                <button id="DeleteBtn" class="btn btn-danger" onclick="DeleteRow()">Delete</button>
+                <button id="CancelBtn" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 

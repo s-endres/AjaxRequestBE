@@ -51,7 +51,7 @@
                     if (data) {
                         window.location.replace("http://localhost:61232/Books/Index");
                     } else {
-                        if ($("#ServerError").length == 0 ){
+                        if ($("#ServerError").length == 0) {
                             $("input[type='button']").parent().prepend("<div id='ServerError' style='margin-bottom:15px'><p class='label label-danger'>The server encountered an error</p></div>");
                         }
                     }
@@ -63,9 +63,9 @@
         }
     }
 
-        function AddRemoveClasses(Element, ClassToAdd, ClassToRemove) {
-            Element.addClass(ClassToAdd).removeClass(ClassToRemove);
-        }
+    function AddRemoveClasses(Element, ClassToAdd, ClassToRemove) {
+        Element.addClass(ClassToAdd).removeClass(ClassToRemove);
+    }
 </script>
 
 @using (Html.BeginForm())
