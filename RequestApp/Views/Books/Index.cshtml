@@ -20,6 +20,7 @@
 
 <script>
     $(document).ready(function () {
+        //Fetches records from the server
         $MyDataTable = $('#myDT').DataTable({
             ajax: {
                 url: 'http://localhost:61232/Books/GetMyJsonValues',
@@ -39,12 +40,15 @@
             ]
         });
 
+        //Delete logic
+
         $('#myDT').on('click', '.glyphicon-remove', function () {
             $("#Modal-Delete").modal();
             $("#hiddenInput").val($MyDataTable.row($(this).parents('tr')).index());
         });
 
         $(document).on('click', '#Delete-Confirmation', function () {
+            $('.alert').remove();
             $("#Modal-Delete").modal('toggle');
             var DeleteRow = $MyDataTable.row($('#hiddenInput').val());
             $.ajax({
@@ -65,6 +69,17 @@
                 }
             });
         });
+
+        //End of Delete Logic
+
+        //Edit logic
+
+        $('#myDT').on('click', '.glyphicon-edit', function () {
+            window.location.replace("http://localhost:61232/Books/Edit?BookId=" + $MyDataTable.row($(this).parents("tr")).data().BookId);
+        });
+
+
+        //End of Edit logic
     });
 </script>
 

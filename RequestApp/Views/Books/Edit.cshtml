@@ -7,7 +7,98 @@
 <h2>Edit</h2>
 
 <Script>
-    
+    $(document).ready(function () {
+
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getSingleBook",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            data: { bookId: parseInt($.urlParam("BookId")) },
+            success: function (data) {
+                 if (data) {
+                    $("#Title").val(data.Title);
+                    $("#Description").val(data.Description);
+                    $("#ImageUrl").val(data.ImageUrl);
+                    $("#Publisher").val(data.Publisher);
+                    $("#PublicationYear").val(data.PublicationYear);
+                 } else {
+                     window.location.replace("http://localhost:61232/Books/");
+                 }
+            },
+            error: function () {
+                window.location.replace("http://localhost:61232/Books/");
+            }
+        });
+
+        $(document).on('click', '#btnEdit', function () {
+            if (ValidateForm()) {
+                $('.alert').remove();
+                $.ajax({
+                    type: 'put',
+                    url: 'http://localhost:61232/Books/UpdateBook',
+                    data: JSON.stringify({
+                        BookId: parseInt($.urlParam("BookId")),
+                        Title: $('#Title').val(),
+                        Description: $('#Description').val(),
+                        ImageURL: $('#ImageUrl').val(),
+                        Publisher: $('#Publisher').val(),
+                        PublicationYear: $('#PublicationYear').val()
+                    }),
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        if (data) {
+                            window.location = 'http://localhost:61232/Books/'
+                        } else {
+                            $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>The book wasn't edited.</div>");
+                        }
+                    },
+                    error: function () {
+                        $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>Something went wrong while trying to edit the selected book.</div>");
+                    }
+                });
+            }
+        });
+
+        function ValidateForm() {
+            var IsValid = true;
+            $("input[type='text']").each(function () {
+                if (IsEmpty($(this))) {
+                    IsValid = false;
+                }
+            });
+            if (!IsNumber($("#PublicationYear"))) {
+                IsValid = false;
+            }
+            return IsValid;
+        }
+
+        function IsEmpty(input) {
+            if (input.val().trim() == '') {
+                input.addClass('invalid-input');
+                return true;
+            } else {
+                input.removeClass('invalid-input');
+                return false;
+            }
+        }
+
+        function IsNumber(input) {
+            if ($.isNumeric(input.val()) && input.val() > 0) {
+                input.removeClass('invalid-input');
+                return true;
+            } else {
+                input.addClass('invalid-input');
+                return false;
+            }
+        }
+    });
 </Script>
 
 @using (Html.BeginForm())
@@ -72,6 +163,6 @@
     @Html.ActionLink("Back to List", "Index")
 </div>
 
-@section Scripts {
+@*@section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
-}
+}*@
