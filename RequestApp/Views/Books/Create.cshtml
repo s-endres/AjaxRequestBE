@@ -25,11 +25,11 @@
                 if (data) {
                     window.location = 'http://localhost:61232/Books/'
                 } else {
-                    $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>No se pudo agregar el libro.</div>");
+                    $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>The book wasn't added.</div>");
                 }
             },
             error: function () {
-                $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>No se pudo agregar el libro.</div>");
+                $('form').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>Something went wrong while trying to add your book.</div>");
             }
         });
     }

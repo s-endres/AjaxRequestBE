@@ -4,7 +4,7 @@
     ViewBag.Title = "Index";
 }
 <!-- Bootstrap Core CSS -->
-<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+@*<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">*@
 <!-- MetisMenu CSS -->
 <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 <!-- DataTables CSS -->
@@ -13,7 +13,7 @@
 <link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
 <!-- Custom Fonts -->
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+@*<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>*@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
@@ -37,6 +37,33 @@
             columnDefs: [
                 { targets: 6, orderable: false }
             ]
+        });
+
+        $('#myDT').on('click', '.glyphicon-remove', function () {
+            $("#Modal-Delete").modal();
+            $("#hiddenInput").val($MyDataTable.row($(this).parents('tr')).index());
+        });
+
+        $(document).on('click', '#Delete-Confirmation', function () {
+            $("#Modal-Delete").modal('toggle');
+            var DeleteRow = $MyDataTable.row($('#hiddenInput').val());
+            $.ajax({
+                type: 'delete',
+                url: 'http://localhost:61232/Books/DeleteBook',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ bookId: DeleteRow.data().BookId }),
+                success: function (data) {
+                    if (data) {
+                        DeleteRow.remove().draw();
+                    } else {
+                        $('#myDT').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>The selected row wasn't deleted.</div>");
+                    }
+                },
+                error: function () {
+                    $('#myDT').prepend("<div class=\"alert alert-danger alert-dismissable\"><a href=\"#\" class=\"close\" data-dismiss=\"alert\" aria-label=\"close\">×</a>Something went wrong trying to delete your selected row.</div>");
+                }
+            });
         });
     });
 </script>
@@ -75,5 +102,25 @@
     <tbody>
     </tbody>
 </table>
+
+<div id="Modal-Delete" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Delete Row Confirmation
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the selected row?
+                <input type="text" class="form-control custom-hidden" id="hiddenInput">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <a id="Delete-Confirmation" class="btn btn-danger btn-ok">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 

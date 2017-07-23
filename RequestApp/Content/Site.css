@@ -20,3 +20,7 @@ textarea {
     background-color:#f8a4a4;
     border: 1px solid red;
 }
+
+.custom-hidden {
+    display: none;
+}
