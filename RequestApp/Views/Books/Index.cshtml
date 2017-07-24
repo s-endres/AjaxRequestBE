@@ -19,66 +19,137 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
-$(document).ready(function(){
+ $(document).ready(function () {
+
         $Table = $("#myDT").DataTable({
             responsive: true,
             "columnDefs":
             [
                 {
-                    "targets":[0,6],
-                    "sortable":false
+                    "targets": [0, 6],
+                    "sortable": false
                 }
             ]
         });
 
+        $("tbody").on("click", ".glyphicon-ok-circle", function ()
+        {
+            var Row = $(this).parents("tr");
+            var Index = $Table
+            .row(Row)
+            .index();
+            $("#hidden").val(Index);
+            var IndexVal = $("#hidden").val();
+            IdVal = $Table.row(IndexVal).data()[0]
+            window.location.replace("http://localhost:61232/Books/Edit?BookId=" + IdVal);
+
+        });
 
         $.ajax({
-            type:"GET",
-            url:"http://localhost:61232/Books/GetMyJsonValues",
-            data:"",
+            type: "GET",
+            url: "http://localhost:61232/Books/GetMyJsonValues",
+            data: "",
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
-            success: function (Data) {
-                console.log(Data);
-                $.each(Data, function (Index, data) {
-                    var Data2 =
+            success: function (pData) {
+                $.each(pData, function (Index, pArray) {
+                    var Data =
                         [
-                            data.BookId,
-                            data.Title,
-                            data.Description,
-                            data.ImageUrl,
-                            data.Publisher,
-                            data.PublicationYear,
-                            "<span onclick='DeleteRow((this))' class='glyphicon glyphicon-remove-circle'> |</span>" +
-			                "<span class='glyphicon glyphicon-ok-circle'></span>"
+                            pArray.BookId,
+                            pArray.Description,
+                            pArray.ImageUrl,
+                            pArray.PublicationYear,
+                            pArray.Publisher,
+                            pArray.Title,
+                            "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
+                            "<span class='glyphicon glyphicon-ok-circle'></span>"
                         ];
-                    $("#myDT").DataTable()
-                    .row
-                    .add(Data2)
-                    .draw()
-
-
+                    $Table
+                        .row
+                        .add(Data)
+                        .draw()
                 });
-  
             },
             error: function () {
-
-    
+                alert("Oscar se la come toda");
             }
         });
 
-});
+        $(document).on("click", ".glyphicon-remove-circle", function () {
+
+            var Row = $(this).parents("tr");
+            var Index = $Table
+            .row(Row)
+            .index();
+            $("#hidden").val(Index);
+            $("#myModal").modal();
+        });
+        $("#DeleteRow").click(function () {
+            var Index = $("#hidden").val();
+
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:61232/Books/DeleteBook",
+                data: JSON.stringify({ bookId: $Table.row(Index).data()[0] }),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (Data) {
+                    if (Data) {
+                        $Table.row(Index).remove().draw();
+                        CloseModal();
+                    }
+                    else {
+                        if (!$('div[class="alert-danger"]').length) {
+                            $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed deleting the row ToT</div >');
+                        }
+                    }
 
 
+                },
+                error: function () {
+                    WarningMessage();
+                }
+            });//Close Delete Ajax
 
+        });
+        $.ajax({
+            type: "PUT",
+            url: "http://localhost:61232/Books/UpdateBook ",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
 
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });//Close Edit Ajax
 
+    });//Close Document.Ready
+    function CloseModal()
+    {
+        $("#myModal").modal("hide");
+    }
 
-
-
-
+    function WarningMessage()
+    {
+        if (!$('div[class="alert-danger"]').length)
+        {
+            $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
+        }
+    }
 
 </script>
+<style>
+    .Error {
+        border: solid 1px red;
+    }
+
+    #hidden {
+        display: none;
+    }
+</style>
 
 <h2>Index</h2>
 
