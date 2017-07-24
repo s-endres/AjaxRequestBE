@@ -7,7 +7,11 @@
 <h2>Create</h2>
 
 <script>
+<<<<<<< HEAD
     $("document").ready(function(){
+=======
+    $("document").ready(fucntio(){
+>>>>>>> 64791a710a8565ac1c61e65b68fbb5c42b7fc795
 
         $("#btnSave").click(function () {
             if (ValidateForm()) {
@@ -64,12 +68,15 @@
         border: solid 1px red;
     }
 </style>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 64791a710a8565ac1c61e65b68fbb5c42b7fc795
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -109,7 +116,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control"/>
+                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
