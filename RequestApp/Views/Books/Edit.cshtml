@@ -7,7 +7,112 @@
 <h2>Edit</h2>
 
 <Script>
+    $(document).ready(function () {
+
+        
+        $bookId = $.urlParam("variable");
+        console.log(bookId);
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getSingleBook",
+            data: JSON.stringify({ BookId: $bookId }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                
+                    $("BookId").val(data.BookId);
+                    $("#Title").val(data.Title);
+                    $("#Description").val(data.Description);
+                    $("#ImageUrl").val(data.ImageUrl);
+                    $("#Publisher").val(data.Publisher);
+                    $("#PublicationYear").val(data.PublicationYear);
+
+            },
+
+            error: function () {
+                alert("stephan te falle :c");
+            }
+
+        });
+
+        $("#btnEdit").click(function () {
+            editeRow();
+        });
+
+    });
+
+    function editeRow ()
+    {
+        if (validateMyForm()) {
+            $.ajax({
+                type: "PUT",
+                url: " http://localhost:61232/Books/UpdateBook",
+                data: JSON.stringify({ BookId: $bookId, Title: $("#Title").val(), Description: $("#Description").val(), ImageUrl: $("#ImageUrl").val(), Publisher: $("#Publisher").val(), PublicationYear: $("#PublicationYear").val() }),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data) {
+                        window.location.replace("http://localhost:61232/Books/");
+                    }
+                    else {
+                        ValidateMyAlert("Class='alert alert-warning'", 'stephan te falle :c', 'Warning')
+                    }
+
+                },
+
+                error: function () {
+                    ValidateMyAlert("Class='alert alert-danger'", 'stephan te falle. x2', 'Danger')
+                }
+
+            });
+        }
+    }
     
+
+    function validateMyForm() {
+
+        var cellEmpty = true;
+
+        $("input[type='text']").each(function () {
+            if ($(this).val().trim() == "") {
+                changeClass($(this).parent(), "has-success", "has-error");
+                cellEmpty = false;
+            }
+
+            else { changeClass($(this).parent(), "has-error", "has-success"); }
+        });
+
+        $("input[type='number']").each(function () {
+
+            if (!$.isNumeric($(this).val()) || $(this).val() <= 0) {
+
+                changeClass($(this).parent(), "has-success", "has-error");
+                cellEmpty = false;
+            }
+            else { changeClass($(this).parent(), "has-error", "has-success"); }
+
+        });
+
+        return cellEmpty;
+    }
+    
+
+    function ValidateMyAlert(pClass, pString, tMessege) {
+
+        if (!$("p[" + pClass + "]").length) {
+            $("p[class='alert']").remove();
+            $(".form-horizontal").append("<p " + pClass + "><strong>" + tMessege + "</strong> " + pString + " </p>");
+        }
+
+    }
+
+    function changeClass(input, classRemove, classAdd) {
+        input.removeClass(classRemove);
+        input.addClass(classAdd);
+    }
+
 </Script>
 
 @using (Html.BeginForm())

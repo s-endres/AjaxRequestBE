@@ -36,7 +36,7 @@
 
                 $.each(data, function (index, item) {
 
-                    var array = [item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\"data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+                    var array = [item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
                     $table.row.add(array).draw();
                 });
 
@@ -51,9 +51,17 @@
 
     });
 
-    function removeRow(bottom) {
+    function editRow (button)
+    {
+        var actualRow = $(button).parents("tr");
+        var rowIndex = $table.row(actualRow).index();
+        var row = $table.row(rowIndex).data()
+        window.location.replace("http://localhost:61232/Books/Edit?variable=" + row[0]);
+    }
 
-        var actualRow = $(bottom).parents("tr");
+    function removeRow(button) {
+
+        var actualRow = $(button).parents("tr");
         deleteForm(actualRow);
         $('#exampleModal').modal('show');
 
@@ -62,10 +70,9 @@
 
     function deleteForm(ActualRow) {
 
-        console.log(ActualRow);
-        var rowIndex = $('#myDT').DataTable().row(ActualRow).index();
-        var row = $('#myDT').DataTable().row(rowIndex).data()
-        console.log(row[0])
+        var rowIndex = $table.row(ActualRow).index();
+        var row = $table.row(rowIndex).data()
+
         $("#yesDelete").click(function () {
             $.ajax({
                 type: "DELETE",
@@ -77,7 +84,7 @@
                     
                     if (data) {
 
-                        $('#myDT').DataTable().row(ActualRow).remove().draw();
+                       $table.row(ActualRow).remove().draw();
                         ValidateMyAlert("Class='alert alert-success'", ' Complete', 'Success')
 
                     }
