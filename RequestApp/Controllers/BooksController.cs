@@ -70,7 +70,7 @@ namespace RequestApp.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddNewBook([Bind(Include = "Title,Description,ImageUrl,Publisher,PublicationYear")] Book book)
+        public JsonResult AddNewBook([Bind(Include = "Title,Description,ImageUrl,Publisher,PublicationYear")] Book book, List<Author> Authors)
         {
             try
             {
