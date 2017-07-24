@@ -9,15 +9,19 @@
 <Script>
     $(document).ready(function () {
 
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
         
-        $bookId = $.urlParam("variable");
+        var bookId = $.urlParam("variable");
         console.log(bookId);
 
 
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/getSingleBook",
-            data: JSON.stringify({ BookId: $bookId }),
+            data: { BookId: bookId},
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
@@ -38,18 +42,26 @@
         });
 
         $("#btnEdit").click(function () {
-            editeRow();
+            editeRow(bookId);
         });
 
     });
 
-    function editeRow ()
+    function editeRow (bookId)
     {
+        console.log($("#Title").val());
         if (validateMyForm()) {
             $.ajax({
                 type: "PUT",
                 url: " http://localhost:61232/Books/UpdateBook",
-                data: JSON.stringify({ BookId: $bookId, Title: $("#Title").val(), Description: $("#Description").val(), ImageUrl: $("#ImageUrl").val(), Publisher: $("#Publisher").val(), PublicationYear: $("#PublicationYear").val() }),
+                data: JSON.stringify({
+                    BookId: bookId,
+                    Title: $("#Title").val(),
+                    Description: $("#Description").val(),
+                    ImageUrl: $("#ImageUrl").val(),
+                    Publisher: $("#Publisher").val(),
+                    PublicationYear: $("#PublicationYear").val()
+                }),
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
