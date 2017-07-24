@@ -7,13 +7,119 @@
 <h2>Edit</h2>
 
 <Script>
-    
+    $(document).ready(function () {
+
+        $.urlParam = function (pName) {
+            var results = new RegExp('[\?&]' + pName + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
+
+        BookObject = { BookId: $.urlParam("BookId") };
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getSingleBook",
+            data: BookObject,
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+
+                $("#Description").val(Data.Description);
+                $("#ImageUrl").val(Data.ImageUrl);
+                $("#PublicationYear").val(Data.PublicationYear);
+                $("#Publisher").val(Data.Publisher);
+                $("#Title").val(Data.Title);
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });//Close GET Ajax
+
+
+
+        $("#btnEdit").click(function () {
+            JasonObject = {
+                BookId: $.urlParam("BookId"),
+                Description: $("#Description").val(),
+                ImageUrl: $("#ImageUrl").val(),
+                PublicationYear: $("#PublicationYear").val(),
+                Publisher: $("#Publisher").val(),
+                Title: $("#Title").val()
+            };
+            if (Validate) {
+                $.ajax({
+                    type: "PUT",
+                    url: "http://localhost:61232/Books/UpdateBook ",
+                    data: JSON.stringify(JasonObject),
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (Data) {
+                        window.location.replace("http://localhost:61232/Books");
+                    },
+                    error: function () {
+                        WarningMessage();
+                    }
+                });//Close PUT Ajax
+            }
+        });
+
+
+
+    });//End of DocumentReady
+
+
+    function WarningMessage() {
+        if (!$('div[class="alert-danger"]').length) {
+            $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
+        }
+    }
+
+
+    function Validate() {
+        var Error = true;
+        $('.form-horizontal input[class="form-control"]').each(function () {
+            if ($(this).val().trim() == "") {
+                $(this).addClass("Error");
+                Error = false;
+            }
+            else {
+                $(this).removeClass("Error");
+            }
+        });
+        return Error;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </Script>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -62,7 +168,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="Save" class="btn btn-default" id="btnEdit"/>
+                <input type="button" value="Save" class="btn btn-default" id="btnEdit" />
             </div>
         </div>
     </div>
