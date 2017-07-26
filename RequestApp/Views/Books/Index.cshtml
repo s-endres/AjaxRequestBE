@@ -83,9 +83,7 @@
                     contentType: 'application/json; charset=utf-8',
                     success: function (data) {
                         if (data) {
-                            var a = format(data);
-                            console.log(a);
-                            row.child(a).show();
+                            row.child(format(data)).show();
                             tr.addClass('shown');
                         } else {
                             alert('Wops ERROR O.O" ');
@@ -97,7 +95,6 @@
                 });
                 // Open this row
             }
-
         });
 
 
