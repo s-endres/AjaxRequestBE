@@ -17,9 +17,141 @@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
+<style>
+    .glyphicon:hover {
+        cursor: pointer;
+    }
+</style>
 <script>
+    $(document).ready(function () {
+        $.get('http://localhost:61232/Books/GetMyJsonValues', function (data) {
+            setDTWithData(data);
+        });
 
+        $('#myDT tbody').on('click', '.glyphicon-remove-sign', function () {
+            var tr = $(this).parents('tr');
+            var index = $Table.row(tr).index();
+            var rowData = $Table.row(index).data();
+
+            $.ajax({
+                type: "DELETE",
+                url: "http://localhost:61232/Books/DeleteBook",
+                data: JSON.stringify({
+                    bookId: rowData.BookId
+                }),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (data) {
+                        console.log(data);
+                    } else {
+                        alert('Wops ERROR O.O" ');
+                    }
+                },
+                error: function () {
+                    alert('Wops ERROR O.O" ');
+                }
+            });
+            //Then we remove the row, without the need to load new data from the server
+            $Table.row(tr).remove().draw();
+        }); // End Remove Event
+
+
+        $('#myDT tbody').on('click', '.glyphicon-ok-sign', function () {
+            var tr = $(this).parents('tr');
+            var index = $Table.row(tr).index();
+            var rowData = $Table.row(index).data();
+            window.location.replace("http://localhost:61232/Books/Edit?bookId=" + rowData.BookId);
+        });
+
+        $('#myDT tbody').on('click', '.glyphicon-minus-sign', function () {
+            var tr = $(this).parents('tr');
+            var row = $Table.row(tr)
+            var rowData = $Table.row(row.index()).data();
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:61232/Books/getBookAuthors",
+                    data: { bookId: rowData.BookId },
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        if (data) {
+                            var a = format(data);
+                            console.log(a);
+                            row.child(a).show();
+                            tr.addClass('shown');
+                        } else {
+                            alert('Wops ERROR O.O" ');
+                        }
+                    },
+                    error: function () {
+                        alert('Wops ERROR O.O" ');
+                    }
+                });
+                // Open this row
+            }
+
+        });
+
+
+
+
+    }); // End Document ready
+
+    function format(data) {
+        // `d` is the original data object for the row
+        var tableHtml = '<table class="table-striped">' +
+            '<tr>' +
+                '<th>First Name:</th>' +
+                '<th>Second Name:</th>' +
+                '<th>First Last Name:</th>' +
+                '<th>Second Last Name:</th>' +
+            '</tr>';
+
+        $.each(data,
+            function(index, obj) {
+                tableHtml += '<tr>' +
+                                '<td>' + obj.FirstName+ '</td>' +
+                                '<td>' + obj.SecondName + '</td>' +
+                                '<td>' + obj.FirstLastName + '</td>' +
+                                '<td>' + obj.SecondLastName + '</td>' +
+                            '</tr>';
+            });
+
+        return tableHtml + '</table>';
+    }
+
+    function setDTWithData(getData) {
+        $Table = $('#myDT').DataTable({
+            "processing": true,
+            "data": getData,
+            "columns": [
+                    { "defaultContent": "<span class='glyphicon glyphicon-minus-sign showChild'></span>" },
+                    { "data": "BookId" },
+                    { "data": "Description" },
+                    { "data": "ImageUrl" },
+                    { "data": "PublicationYear" },
+                    { "data": "Publisher" },
+                    { "data": "Title" },
+                    { "defaultContent": "<span class='glyphicon glyphicon-remove-sign'></span> <span> | </span> <span class='glyphicon glyphicon-ok-sign''></span>" }
+            ],
+            responsive: true,
+            "columnDefs": [
+                {
+                    "targets": [0,7],
+                    "orderable": false
+                }
+            ],
+            "order": [[1, "asc"]]
+        });
+    }
 </script>
 
 <h2>Index</h2>
@@ -30,6 +162,9 @@
 <table id="myDT" class="table">
     <thead>
         <tr>
+            <th>
+                
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.BookId)
             </th>
@@ -53,8 +188,7 @@
             </th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 

@@ -165,6 +165,17 @@ namespace RequestApp.Controllers
                 return Json(false, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult getBookAuthors(int? bookId)
+        {
+            if (bookId != null)
+            {
+                var foundBook = tempBooks.Where(s => s.BookId == bookId).FirstOrDefault();
+                return Json(foundBook.Authors, JsonRequestBehavior.AllowGet);
+            }
+            return Json(false, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPut]
         public JsonResult UpdateBook([Bind(Include = "BookId,Title,Description,ImageUrl,Publisher,PublicationYear")] Book book, List<Author> authors)
         {
