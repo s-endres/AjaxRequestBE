@@ -22,7 +22,24 @@ namespace RequestApp.Controllers
                 Description = "Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.",
                 ImageUrl = "MyImage.jpg",
                 Publisher = "This is my publisher",
-                PublicationYear = 2052
+                PublicationYear = 2052,
+                Authors = new List<Author>()
+                {
+                    new Author()
+                    {
+                        FirstName = "Luis",
+                        SecondName = "Diego",
+                        FirstLastName = "Rodriguez",
+                        SecondLastName = "Gonzales"
+                    },
+                    new Author()
+                    {
+                        FirstName = "Alfredo",
+                        SecondName = "Papito",
+                        FirstLastName = "Valverde",
+                        SecondLastName = "Gonzales"
+                    }
+                }
             },
             new Book
             {
@@ -31,7 +48,24 @@ namespace RequestApp.Controllers
                 Description = "Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.",
                 ImageUrl = "MyImage2.jpg",
                 Publisher = "Alfredo Valverde",
-                PublicationYear = 1024
+                PublicationYear = 1024,
+                Authors = new List<Author>()
+                {
+                    new Author()
+                    {
+                        FirstName = "Luis1",
+                        SecondName = "Diego1",
+                        FirstLastName = "Rodriguez1",
+                        SecondLastName = "Gonzales1"
+                    },
+                    new Author()
+                    {
+                        FirstName = "Alfredo2",
+                        SecondName = "Papito2",
+                        FirstLastName = "Valverde2",
+                        SecondLastName = "Gonzales3"
+                    }
+                }
             },
             new Book
             {
@@ -40,7 +74,31 @@ namespace RequestApp.Controllers
                 Description = "Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.",
                 ImageUrl = "MyImage.jpg",
                 Publisher = "Oscar Valverde",
-                PublicationYear = 592
+                PublicationYear = 592,
+                Authors = new List<Author>()
+                {
+                    new Author()
+                    {
+                        FirstName = "Luis",
+                        SecondName = "Diego",
+                        FirstLastName = "Rodriguez",
+                        SecondLastName = "Gonzales"
+                    },
+                    new Author()
+                    {
+                        FirstName = "Alfredo",
+                        SecondName = "Papito",
+                        FirstLastName = "Valverde",
+                        SecondLastName = "Gonzales"
+                    },
+                    new Author()
+                    {
+                        FirstName = "Oscar",
+                        SecondName = "El Grande",
+                        FirstLastName = "Valverde",
+                        SecondLastName = "Gonzales"
+                    }
+                }
             },
         };
 
@@ -70,11 +128,12 @@ namespace RequestApp.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddNewBook([Bind(Include = "Title,Description,ImageUrl,Publisher,PublicationYear")] Book book)
+        public JsonResult AddNewBook([Bind(Include = "Title,Description,ImageUrl,Publisher,PublicationYear")] Book book, List<Author> authors)
         {
             try
             {
                 book.BookId = tempBooks.Count + 1;
+                book.Authors = authors;
                 tempBooks.Add(book);
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
@@ -82,7 +141,6 @@ namespace RequestApp.Controllers
             {
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
-
         }
         [HttpDelete]
         public JsonResult DeleteBook(int? bookId)
@@ -108,7 +166,7 @@ namespace RequestApp.Controllers
         }
 
         [HttpPut]
-        public JsonResult UpdateBook([Bind(Include = "BookId,Title,Description,ImageUrl,Publisher,PublicationYear")] Book book)
+        public JsonResult UpdateBook([Bind(Include = "BookId,Title,Description,ImageUrl,Publisher,PublicationYear")] Book book, List<Author> authors)
         {
             if (book.BookId != null)
             {
@@ -118,6 +176,7 @@ namespace RequestApp.Controllers
                 foundBook.ImageUrl = book.ImageUrl;
                 foundBook.Publisher = book.Publisher;
                 foundBook.PublicationYear = book.PublicationYear;
+                foundBook.Authors = authors;
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
             return Json(false, JsonRequestBehavior.AllowGet);
