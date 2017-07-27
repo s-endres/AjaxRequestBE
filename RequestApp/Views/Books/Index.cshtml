@@ -19,26 +19,26 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <script>
- $(document).ready(function () {
+    $(document).ready(function () {
 
         $Table = $("#myDT").DataTable({
             responsive: true,
             "columnDefs":
             [
                 {
-                    "targets": [0, 6],
+                    "targets": [0, 7],
                     "sortable": false
                 }
-            ]
-        });
+            ],
+            "order": [[1, "asc"]]
+        });//Initialize Data Table 
 
-        $("tbody").on("click", ".glyphicon-ok-circle", function ()
-        {
+        $("tbody").on("click", ".glyphicon-ok-circle", function () {
             var Row = $(this).parents("tr");
             IdVal = $Table.row(Row).data()[0];
             window.location.replace("http://localhost:61232/Books/Edit?BookId=" + IdVal);
 
-        });
+        });//Redirect
 
         $.ajax({
             type: "GET",
@@ -50,6 +50,7 @@
                 $.each(pData, function (Index, pArray) {
                     var Data =
                         [
+                            "<span class='glyphicon glyphicon-download' id='Shown'>",
                             pArray.BookId,
                             pArray.Description,
                             pArray.ImageUrl,
@@ -68,14 +69,14 @@
             error: function () {
                 alert("Oscar se la come toda");
             }
-        });
+        });//Close GET
 
         $(document).on("click", ".glyphicon-remove-circle", function () {
 
             var Row = $(this).parents("tr");
             var Index = $Table
-            .row(Row)
-            .index();
+                .row(Row)
+                .index();
             $("#hidden").val(Index);
             $("#myModal").modal();
         });
@@ -85,7 +86,7 @@
             $.ajax({
                 type: "DELETE",
                 url: "http://localhost:61232/Books/DeleteBook",
-                data: JSON.stringify({ bookId: $Table.row(Index).data()[0] }),
+                data: JSON.stringify({ bookId: $Table.row(Index).data()[1] }),
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
                 success: function (Data) {
@@ -106,21 +107,68 @@
                 }
             });//Close Delete Ajax
 
-        });
-       
+        });//Close Delete Function
+
+        $("#myDT tbody").on("click", ".glyphicon-download,.glyphicon-upload", function () {
+            var RClass = "glyphicon-download";
+            var AClass = "glyphicon-upload";
+
+            var Tr = $(this).closest("tr");/**HTML Row**/
+            var row = $Table.row(Tr);/**DataTable Row**/
+            var Index = $Table
+                .row(row)
+                .index();
+
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:61232/Books/getBookAuthors",
+                data: { BookId: $Table.row(Index).data()[1] },
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    if (!data) {
+                        row.child.hide();
+                        ShowLogo(this, AClass, RClass);
+                    }
+                    else {
+                        ShowLogo(this, RClass, AClass);
+                        row.child(Format(data)).show();
+                    }/**Sends the datatable row data to the Format method and show it**/
+
+                },
+                error: function () {
+                    alert("");
+                }
+            });//Close GET Authors Ajax
+
+        });//Close Show More Function 
+      
+            
 
     });//Close Document.Ready
-    function CloseModal()
-    {
+
+
+    function CloseModal() {
         $("#myModal").modal("hide");
     }
 
-    function WarningMessage()
-    {
-        if (!$('div[class="alert-danger"]').length)
-        {
+    function WarningMessage() {
+        if (!$('div[class="alert-danger"]').length) {
             $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
         }
+    }
+    function Format(Data) {
+        var Table = "<table><thead><tr><th>First Name</th><th>Second Name</th><th>First Last Name</th><th>Second Last Name</th></tr></thead><tbody>"
+        for (var i = 0; i >= Data.length; i++)
+        {     
+            Table += "<tr><td>"+Data[i].FirstName+"</td>"+"<td>"+Data[i].SecondName+"</td>"+"<td>"+Data[i].FirstLastName+"</td>"+"<td>"+Data[i].SecondLastName+"</td>"+"</tr>"+"<tbody>"+"</table>";
+            
+        }
+        return Table;
+    }
+    function ShowLogo(pSelector, pRClass, pAClass) {
+        $(pSelector).removeClass(pRClass);
+        $(pSelector).addClass(pAClass);
     }
 
 </script>
@@ -142,6 +190,9 @@
 <table id="myDT" class="table">
     <thead>
         <tr>
+            <th>
+                <label>Les Authors</label>
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.BookId)
             </th>
@@ -165,8 +216,7 @@
             </th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>
 
 
