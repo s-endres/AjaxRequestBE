@@ -151,7 +151,7 @@
             },
 
             error: function () {
-                ValidateMyAlert("Class='alert alert-warning'", ' no se pudo eliminar :( ', 'Warning');
+                ValidateMyAlert("Class='alert alert-warning'", ' no se pudo eliminar :( ', 'Warning')
             }
 
         });
@@ -166,7 +166,7 @@
 
     function format(objAuthorInformation) {
 
-        var Trs
+        var Trs ="";
 
         $.each(objAuthorInformation, function (index, item) { 
             Trs += "<tr>" +
@@ -188,7 +188,7 @@
                     "</thead>" +
                         "<tbody>" +
                                 Trs+
-                            "</tbody>" +
+                        "</tbody>" +
                 "</table>";
     }
 
