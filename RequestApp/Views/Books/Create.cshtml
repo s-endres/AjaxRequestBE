@@ -3,17 +3,57 @@
 @{
     ViewBag.Title = "Create";
 }
+<!-- MetisMenu CSS -->
+<link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+<!-- DataTables CSS -->
+<link href="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+<!-- DataTables Responsive CSS -->
+<link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- DataTables JavaScript -->
+<script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <h2>Create</h2>
 <style>
+    #hidden {
+        display: none;
+    }
+
     .Error {
-        border: solid 2px red;
+        border: solid 1px red;
+    }
+
+    .glyphicon:hover {
+        cursor: pointer;
     }
 </style>
 <script>
     $(document).ready(function () {
+        $table = $('#myTable').DataTable({
+            responsive: true
+        });
+
+        $('#btnAdd').click(function () {
+            ButtonChange(true);
+        });
+
+        $('#myModal').on('hidden.bs.modal', function () {
+            $('input[class="form-control"]').val("");
+        });
+
+        $('#btnCreate').click(function () {
+            if (Validate(".modal-content")) {
+                var Data = getInputsData();
+                $("#myTable").DataTable().row.add(Data).draw();
+                $("#myModal").modal("hide");
+            }
+        });
+
         $("#btnSave").click(function () {
-            if (Validate()) {
+            if (Validate(".form-horizontal") && $table.data().length > 0) {
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
@@ -24,7 +64,8 @@
                         Description: $("#Description").val(),
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
-                        PublicationYear: $("#PublicationYear").val()
+                        PublicationYear: $("#PublicationYear").val(),
+                        Authors: GetAuthors()
                     }),
                     success: function (data) {
                         if (data) {
@@ -39,11 +80,38 @@
                 });
             }
         });
+
+
     });
 
-    function Validate() {
+    $(document).on("click", ".glyphicon-remove-circle", function () {
+        var Parent = $(this).parents("tr");
+        $("#myTable").DataTable().row(Parent).remove().draw();
+    });
+
+    $(document).on("click", ".glyphicon-ok-circle", function () {
+        var Parent = $(this).parents("tr");
+        ButtonChange(false);
+        var index = $("#myTable").DataTable().row(Parent).index();
+        var array = $("#myTable").DataTable().row(index).data();
+        $("#IdFirstInput").val(array[0]);
+        $("#IdSecondInput").val(array[1]);
+        $("#IdThirdInput").val(array[2]);
+        $("#IdFourthInput").val(array[3]);
+        $("#hidden").val(index);
+    });
+
+    $(document).on("click", "#btnUpdate", function () {
+        if (Validate(".modal-content")) {
+            var idx = $("#hidden").val();
+            $("#myTable").DataTable().row(idx).data(getInputsData()).draw();
+            $("#myModal").modal("hide");
+        }
+    });
+
+    function Validate(Zone) {
         var validation = true;
-        $(".form-control").each(function () {
+        $(Zone + " .form-control").not("#hidden").each(function () {
             if ($(this).val().trim() == '' || $(this).val() < 0) {
                 $(this).addClass("Error");
                 validation = false;
@@ -59,6 +127,33 @@
             $("#" + idRemove).remove();
             $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>No me agregué.</div >');
         }
+    }
+
+    function ButtonChange(create) {
+        if (create) {
+            $("#btnCreate").css("display", "inline");
+            $("#btnUpdate").css("display", "none");
+        } else {
+            $("#btnUpdate").css("display", "inline");
+            $("#btnCreate").css("display", "none");
+        }
+        $('#myModal').modal('show');
+    }
+
+    function getInputsData() {
+        return [$("#IdFirstInput").val(),
+        $("#IdSecondInput").val(),
+        $("#IdThirdInput").val(),
+        $("#IdFourthInput").val(),
+        "<span class='glyphicon glyphicon-remove-circle'> | </span>" +
+        "<span class='glyphicon glyphicon-ok-circle'></span>"];
+    }
+
+    function GetAuthors() {
+        //var Arreglo[];
+        //for (var i = 0; i < $table.length; i++) {
+        //    Arreglo.push($table.data()[i]);
+        //}
     }
 </script>
 
@@ -109,11 +204,62 @@
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
+    </div>
 
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Second Name</th>
+                <th>First Last Name</th>
+                <th>Second Last Name</th>
+                <th>Buttons</th>
+
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+        <button type="button" class="btn btn-info btn-lg" id="btnAdd">Add author</button>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="button" id="btnSave" value="Create" class="btn btn-default" />
             </div>
+        </div>
+
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Modal Header</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="IdFirstInput">First Input:</label>
+                        <input type="text" class="form-control" id="IdFirstInput">
+                    </div>
+                    <div class="form-group">
+                        <label for="IdSecondInput">Second Input:</label>
+                        <input type="text" class="form-control" id="IdSecondInput">
+                    </div>
+                    <div class="form-group">
+                        <label for="IdThirdInput">Third Input:</label>
+                        <input type="text" class="form-control" id="IdThirdInput">
+                    </div>
+                    <div class="form-group">
+                        <label for="IdFourthInput">Fourth Input:</label>
+                        <input type="text" class="form-control" id="IdFourthInput">
+                    </div>
+                    <input type="text" class="form-control" id="hidden">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default" id="btnCreate">Create</button>
+                    <button type="button" class="btn btn-default" id="btnUpdate">Update</button>
+                </div>
+            </div>
+
         </div>
     </div>
 }
