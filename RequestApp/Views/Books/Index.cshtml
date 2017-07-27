@@ -4,7 +4,7 @@
     ViewBag.Title = "Index";
 }
 <!-- Bootstrap Core CSS -->
-<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+@*<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">*@
 <!-- MetisMenu CSS -->
 <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 <!-- DataTables CSS -->
@@ -61,6 +61,25 @@
             window.location.href = 'http://localhost:61232/Books/Edit?BookId=' + $DTable.row(Input).data().BookId;
         })
 
+        $('#myDT tbody').on('click', '.glyphicon-plus-sign, .glyphicon-minus-sign', function () {
+            var tr = $(this).parents('tr');
+            var row = $DTable.row(tr);
+            var FirstClass = 'glyphicon-plus-sign';
+            var SecondClass = 'glyphicon-minus-sign';
+            if (row.child.isShown()) {
+                row.child.hide();
+                tr.removeClass('shown');
+                SwapIcon(this, SecondClass, FirstClass);
+
+            } else {
+                SwapIcon(this, FirstClass, SecondClass);
+                setDropTable(row);
+                row.child(format(Data)).show();
+                //row.child(format(row.data().Authors)).show(); -llamando directamente Author del objecto-
+                tr.addClass('shown');
+            }
+        });
+
     });
 
     function pError() {
@@ -69,10 +88,34 @@
         }
     }
 
+    function format(datarow) {
+        var TRs = ""
+        for (var i = 0; i < datarow.length; i++) {
+            TRs += "<tr><td>" + datarow[i].FirstName + "</td><td>" + datarow[i].SecondName + "</td><td>" + datarow[i].FirstLastName + "</td><td>" + datarow[i].SecondLastName + "</td></tr>"
+        }   
+        return "<table>" +
+            "<thead>" +
+            "<tr>" +
+            "<th>  First name </th >" +
+            "<th> Second name </th >" +
+            "<th>  Lastname </th>" +
+            "<th>  First name </th >" +
+            "</tr>" +
+            "</thead>" +
+            "<tbody>" + TRs +"</tbody>"+
+            "</table>";
+    }
+
+    function SwapIcon(pSelector, pRClass, pAClass) {
+        $(pSelector).addClass(pAClass);
+        $(pSelector).removeClass(pRClass);
+    }
+
     function setDataTable(Data) {
         $DTable = $('#myDT').DataTable({
             "data": Data,
             "columns": [
+                { 'defaultContent': "<span class=\"glyphicon glyphicon-plus-sign\"></span>" },
                 { "data": "BookId" },
                 { "data": "Description" },
                 { "data": "ImageUrl" },
@@ -81,15 +124,35 @@
                 { "data": "Title" },
                 { 'defaultContent': "<span class=\"glyphicon glyphicon-edit\"></span> | <span class=\"glyphicon glyphicon-trash data-toggle=\"modal\" data-target=\"#myModal\"></span>" }
             ],
+            "order": [[1, 'asc']],
+            responsive: true, 
             "columnDefs": [
                 {
-                    "targets": [6],
+                    "targets": [0,7],
                     "sortable": false
                 }
-            ]
+            ]            
+
+        }); 
+    }
+
+    function setDropTable(row) {
+        var x;
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getBookAuthors",
+            data: ({
+                BookId: row.data().BookId
+            }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                row.child(format(Data)).show();
+            },
+            error: function () {
+                pError();
+            }
         });
-
-
     }
 
 </script>
@@ -102,7 +165,11 @@
 
 <table id="myDT" class="table">
     <thead>
-        <tr>
+        <tr> 
+            <th>
+                <label>More Info</label>
+            </th>
+            
             <th>
                 @Html.DisplayNameFor(model => model.BookId)
             </th>

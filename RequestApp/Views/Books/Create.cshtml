@@ -16,6 +16,27 @@
 <script>
     $(document).ready(function () {
 
+
+        $vDTable = $('#dTable').DataTable({
+
+            "order": [[1, 'asc']],
+            responsive: true,
+            "columnDefs": [
+                {
+                    "targets": [5, 6],
+                    "visible": false,
+                    "searchable": false
+
+                },
+
+                {
+                    "targets": [0, 7],
+                    "sortable": false
+                }
+            ]
+
+        });  
+
         $("#btnSave").click(function () {
 
             if (validateMyForm()) {
@@ -48,42 +69,75 @@
 
 
         });
-        function pError() {
-            if (!$("p[class='ErrorClass']").length) {
-                $(".form-horizontal").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
-            } 
-        }
-
-        function validateMyForm() {
-            var flag = true;
-            $("input[type='text']").each(function () {
-                if ($(this).val().trim() == "") {
-                    SwapClass($(this).parent(), "has-success", "has-error");
-                    flag = false;
-                } else {
-                    SwapClass($(this).parent(), "has-error", "has-success");
-                }
-
-            })
-
-            $("input[type='number']").each(function () {
-                console.log($(this).val());
-                if ($(this).val().trim() == "" || $(this).val() <= 0) {
-                    SwapClass($(this).parent(), "has-success", "has-error");
-                    flag = false;
-                } else {
-                    SwapClass($(this).parent(), "has-error", "has-success");
-                }
-
-            });
-            return flag;
-        }
-        function SwapClass(ThisText, ClassR, ClassA) {
-            $(ThisText).removeClass(ClassR);
-            $(ThisText).addClass(ClassA);
-        }
 
     });
+
+    function pError() {
+        if (!$("p[class='ErrorClass']").length) {
+            $(".form-horizontal").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
+        }
+    }
+
+    function validateMyForm() {
+        var flag = true;
+        $("input[type='text']").each(function () {
+            if ($(this).val().trim() == "") {
+                SwapClass($(this).parent(), "has-success", "has-error");
+                flag = false;
+            } else {
+                SwapClass($(this).parent(), "has-error", "has-success");
+            }
+
+        })
+
+        $("input[type='number']").each(function () {
+            console.log($(this).val());
+            if ($(this).val().trim() == "" || $(this).val() <= 0) {
+                SwapClass($(this).parent(), "has-success", "has-error");
+                flag = false;
+            } else {
+                SwapClass($(this).parent(), "has-error", "has-success");
+            }
+
+        });
+        return flag;
+    }
+    function SwapClass(ThisText, ClassR, ClassA) {
+        $(ThisText).removeClass(ClassR);
+        $(ThisText).addClass(ClassA);
+    }
+
+    function validateMyModalForm() {
+        var flag = true;
+        $("#myModalForm div input[type='text']").each(function () {
+            if ($.trim(this.value) == "") {
+                $(this).addClass("Error");
+                flag = false;
+            } else {
+                $(this).removeClass("Error");
+            }
+        });
+        return flag;
+    }
+
+    function add() {
+        if (validateMyModalForm()) {
+            $vDTable.row.add([
+                "<span id='MoreInfoIcon' class='glyphicon glyphicon-plus-sign'></span>",
+                $("#firstInput").val(),
+                $("#secondInput").val(),
+                $("#thirdInput").val(),
+                $("#fourthInput").val(),
+                $("#fifthInput").val(),
+                $("#sixthInput").val(),
+                "<span class='glyphicon glyphicon-trash'></span> <span> | </span> " +
+                "<span class='glyphicon glyphicon-pencil' onclick='editMyRow(this)'></span>"
+            ]).draw();
+
+            $("#myModalForm div input[type='text']").val("");
+            $("#btnClose").click();
+        }
+    }
 
 </script>
 
@@ -141,7 +195,86 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                Authors |
+                <span class="glyphicon glyphicon-folder-open" id="addRowGlyphicon" data-toggle="modal" data-target="#myModal">
+                </span>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <div id="dTable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+                        <div class="row"><div class="col-sm-6"><div class="dataTables_length" id="dTable_length"><label>Show <select name="dTable_length" aria-controls="dTable" class="form-control input-sm"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> entries</label></div></div><div class="col-sm-6"><div id="dTable_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="dTable"></label></div></div></div><div class="row">
+                            <div class="col-sm-12">
+                                <table class="table dataTable no-footer" id="dTable" role="grid" aria-describedby="dTable_info">
+                                    <thead>
+                                        <tr role="row"><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Show More" style="width: 276px;">Show More</th><th class="sorting_asc" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="First Input: activate to sort column descending" style="width: 260px;">First Input</th><th class="sorting" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-label="Second Input: activate to sort column ascending" style="width: 316px;">Second Input</th><th class="sorting" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-label="Third Input: activate to sort column ascending" style="width: 274px;">Third Input</th><th class="sorting" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-label="Fourth Input: activate to sort column ascending" style="width: 300px;">Fourth Input</th><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Buttons" style="width: 216px;">Buttons</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="odd"><td valign="top" colspan="6" class="dataTables_empty">No data available in table</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="dataTables_info" id="dTable_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="dataTables_paginate paging_simple_numbers" id="dTable_paginate">
+                                    <ul class="pagination"><li class="paginate_button previous disabled" aria-controls="dTable" tabindex="0" id="dTable_previous"><a href="#">Previous</a></li><li class="paginate_button next disabled" aria-controls="dTable" tabindex="0" id="dTable_next"><a href="#">Next</a></li></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="myModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalHeadAdd">Add new Author</h4>
+                    <h4 class="modal-title" id="myModalHeadEdit" style="display:none">Edit Row</h4>
+                </div>
+                <div id="myModalBody" class="modal-body">
+                    <form id="myModalForm">
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">First Name:</label>
+                            <input type="text" class="form-control" id="firstInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">Second Name:</label>
+                            <input type="text" class="form-control" id="secondInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">LastName:</label>
+                            <input type="text" class="form-control" id="thirdInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">Surname:</label>
+                            <input type="text" class="form-control" id="fourthInput">
+                        </div>
+
+                        <input type="text" class="form-control" style="display:none" id="hiddenInput">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btnAdd" class="btn btn-primary" onclick="add()">Add Author</button>
+                    <button type="button" id="btnEdit" class="btn btn-primary" style="display:none">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
+
+
 
 <div>
     @Html.ActionLink("Back to List", "Index")
