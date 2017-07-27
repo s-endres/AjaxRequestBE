@@ -23,7 +23,8 @@
 
         $table = $('#myDT').DataTable({
             responsive: true,
-            "columnDefs": [{ "targets": [6], "orderable": false }]
+            "order": [[1, "asc"]],
+            "columnDefs": [{"targets": [0,7], "orderable": false }]
         });
 
         $.ajax({
@@ -36,7 +37,7 @@
 
                 $.each(data, function (index, item) {
 
-                    var array = [item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+                    var array = ["<td> <button type=\"button\" class=\"glyphicon glyphicon-plus\" onclick = \"ShowChild((this))\"></button> </td>", item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
                     $table.row.add(array).draw();
                 });
 
@@ -114,6 +115,83 @@
 
     }
 
+    function ShowChild(button) {
+
+        var tr = $(button).closest("tr");
+        var actualRow = $table.row(tr);
+        var rowIndex = $table.row(actualRow).index();
+        var row = $table.row(rowIndex).data();
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/GetMyJsonValues",
+            data: { BookId: row[1] },
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $.each(data, function (index, item) {
+                    console.log(item.BookId);
+                    if (item.BookId == row[1])
+                    {
+                        if (actualRow.child.isShown()) {
+                            // This row is already open - close it
+                            actualRow.child.hide();
+                            tr.removeClass('shown');
+                            changeOfClasses(button, "glyphicon glyphicon-plus", "glyphicon glyphicon-minus");
+                        }
+                        else {
+                            // Open this row (the format() function would return the data to be shown)                   
+                            actualRow.child(format(item.Authors)).show();
+                            tr.addClass('shown');
+                            changeOfClasses(button, "glyphicon glyphicon-minus", "glyphicon glyphicon-plus");
+                        }
+                    }
+                });
+
+            },
+
+            error: function () {
+                ValidateMyAlert("Class='alert alert-warning'", ' no se pudo eliminar :( ', 'Warning');
+            }
+
+        });
+
+    }
+
+
+    function changeOfClasses(Idelement, classToAdd, classToRemove) {
+        $(Idelement).removeClass(classToRemove).addClass(classToAdd);
+    }
+
+
+    function format(objAuthorInformation) {
+
+        var Trs
+
+        $.each(objAuthorInformation, function (index, item) { 
+            Trs += "<tr>" +
+                        "<td>" + item.FirstName + "</td>" +
+                        "<td>" + item.SecondName + "</td>" +
+                        "<td>" + item.FirstLastName + "</td>" +
+                        "<td>" + item.SecondLastName + "</td>" +
+                    "</tr>" 
+        });
+        
+        return "<table>" +
+                    "<thead>" +
+                        "<tr>" +
+                            "<th>  First name </th >" +
+                            "<th> Second name </th >" +
+                            "<th>  Lastname </th >" +
+                            "<th>  Surname </th >" +
+                        "</tr>" +
+                    "</thead>" +
+                        "<tbody>" +
+                                Trs+
+                            "</tbody>" +
+                "</table>";
+    }
+
 </script>
 
 <h2>Index</h2>
@@ -125,6 +203,9 @@
 <table id="myDT" class="table">
     <thead>
         <tr>
+            <th>
+                <label>Show</label>
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.BookId)
             </th>
