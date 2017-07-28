@@ -13,5 +13,6 @@ namespace RequestApp.Models
         public string ImageUrl { get; set; }
         public string Publisher { get; set; }
         public int PublicationYear { get; set; }
+        public List<Author> Authors { get; set; }
     }
 }

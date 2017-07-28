@@ -20,17 +20,13 @@
 
 <script>
     
-    /*
-    usar enlace con GET, usar el dato y cargar la table  http://localhost:61232/Books/GetMyJsonValues
-    */
-
     $(document).ready(function () {
         $MainTable = $("#myDT").DataTable({
             responsive: true,
             "columnDefs":
 		[
 			{
-			    "targets": [6],
+			    "targets": [0,7],
 			    "sortable": false
 			}
 
@@ -46,7 +42,8 @@
             success: function (JsonData) {
                 
                 $.each(JsonData, function (index, item) {
-                    var NewRow = [item.BookId,
+                    var NewRow = ['<span class="glyphicon glyphicon-plus" onclick="ShowAuthors(this)"></span>',
+                                  item.BookId,
                                   item.Description,
                                   item.ImageUrl,
                                   item.PublicationYear,
@@ -104,8 +101,48 @@
         window.location.replace("http://localhost:61232/Books/Edit?BookID=" + $MainTable.row($(button).parents("tr").index()).data()[0]);
     }
 
+   
+    function AuthorSubTable(DataArray) {
+        
+        var Authors = "";
+        for (var index = 0; index < DataArray.length; index++) {
+            Authors += "<tr><td>First Name: " + "<b>" + DataArray[index].FirstName + "</b>" + " Middle Name: " + "<b>" + DataArray[index].SecondName + "</b>" + " Last Name: " + "<b>" + DataArray[index].FirstLastName + "</b>" + " Surname: " +"<b>"+ DataArray[index].SecondLastName +"</b>"+ "</td></tr>"
+        }
+        return "<table>" + Authors + "</table>";
+          
+    }
 
+    function ShowAuthors(button) {
+        var RowIndex = $(button).parents("tr").index();
+        
+        var tr = $(button).parents('tr');
+        var row = $MainTable.row(tr);
 
+        if (row.child.isShown()) {
+            row.child.hide();
+            tr.removeClass('shown');
+            $(button).removeClass("glyphicon glyphicon-minus").addClass("glyphicon glyphicon-plus")
+        } else {
+
+            $.ajax({
+                type: "GET",
+                url: "http://localhost:61232/Books/getBookAuthors",
+                data: { BookId: $MainTable.row(RowIndex).data()[1] },
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                success: function (JsonData) {
+                    row.child(AuthorSubTable(JsonData)).show();
+                    tr.addClass('shown');
+                    $(button).removeClass("glyphicon glyphicon-plus").addClass("glyphicon glyphicon-minus");
+                },
+                error: function () {
+                    console.log("There was an error with the JSON file.");
+                }
+            });
+
+        }
+       
+    }
 
     function ErrorAlert() {
 
@@ -134,6 +171,11 @@
     <thead>
         <tr>
             <th>
+                <label>
+                    Authors
+                </label>
+            </th>
+             <th>
                 @Html.DisplayNameFor(model => model.BookId)
             </th>
             <th>
