@@ -18,7 +18,7 @@
 
 <h2>Create</h2>
 <style>
-    #hidden {
+    #hidden, #deleteHidden {
         display: none;
     }
 
@@ -88,12 +88,17 @@
             }
         });
 
-
+        $("#btnDelete").click(function () {
+            $("#modalDelete").modal("toggle");
+            var Index = $table.row($("#deleteHidden").val());
+            Index.remove().draw();
+        });
     });
 
     $(document).on("click", ".glyphicon-remove-circle", function () {
         var Parent = $(this).parents("tr");
-        $("#myTable").DataTable().row(Parent).remove().draw();
+        $("#deleteHidden").val($table.row(Parent).index());
+        $("#modalDelete").modal('show');
     });
 
     $(document).on("click", ".glyphicon-ok-circle", function () {
@@ -118,7 +123,7 @@
 
     function Validate(Zone) {
         var validation = true;
-        $(Zone + " .form-control").not("#hidden").each(function () {
+        $(Zone + " .form-control").not("#hidden").not("#deleteHidden").each(function () {
             if ($(this).val().trim() == '' || $(this).val() < 0) {
                 $(this).addClass("Error");
                 validation = false;
@@ -281,6 +286,28 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-default" id="btnCreate">Create</button>
                     <button type="button" class="btn btn-default" id="btnUpdate">Update</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modalDelete" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Delete</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Do you really want to delete this?<p>
+                        <input type="text" class="form-control" id="deleteHidden">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default" id="btnDelete">Delete</button>
+                </div>
+                <div class="modal-footer">
+
                 </div>
             </div>
 
