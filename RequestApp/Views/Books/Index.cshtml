@@ -106,17 +106,20 @@
         
         var Authors = "";
         for (var index = 0; index < DataArray.length; index++) {
-            Authors += "<tr><td>First Name: " + "<b>" + DataArray[index].FirstName + "</b>" + " Middle Name: " + "<b>" + DataArray[index].SecondName + "</b>" + " Last Name: " + "<b>" + DataArray[index].FirstLastName + "</b>" + " Surname: " +"<b>"+ DataArray[index].SecondLastName +"</b>"+ "</td></tr>"
+            Authors += "<tr><td>"
+                + DataArray[index].FirstName + "</td>" + "<td>"
+                + DataArray[index].SecondName + "</td>" + "<td>"
+                + DataArray[index].FirstLastName + "</td>" + "<td>"
+                + DataArray[index].SecondLastName + "</td></tr>";
         }
-        return "<table>" + Authors + "</table>";
+     
+        return "<table>" +"<tr><th>First Name</th><th>Middle Name</th><th>Last Name</th><th>Surname</th></tr>" +Authors + "</table>";
           
     }
 
     function ShowAuthors(button) {
-        var RowIndex = $(button).parents("tr").index();
-        
         var tr = $(button).parents('tr');
-        var row = $MainTable.row(tr);
+        var row = $MainTable.row(tr); 
 
         if (row.child.isShown()) {
             row.child.hide();
@@ -127,7 +130,7 @@
             $.ajax({
                 type: "GET",
                 url: "http://localhost:61232/Books/getBookAuthors",
-                data: { BookId: $MainTable.row(RowIndex).data()[1] },
+                data: { BookId: $MainTable.row(row.index()).data()[1] },
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
                 success: function (JsonData) {
