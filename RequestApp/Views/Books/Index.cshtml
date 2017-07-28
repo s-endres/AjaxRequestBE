@@ -126,6 +126,7 @@
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
+                    console.log(row.child(Format(data)));
                     if (!data) {
                         row.child.hide();
                         ShowLogo(this, AClass, RClass);
@@ -158,10 +159,10 @@
         }
     }
     function Format(Data) {
-        var Table = "<table><thead><tr><th>First Name</th><th>Second Name</th><th>First Last Name</th><th>Second Last Name</th></tr></thead><tbody>"
-        for (var i = 0; i >= Data.length; i++)
+        var Table = "<table><thead><tr><th>First Name</th><th>Second Name</th><th>First Last Name</th><th>Second Last Name</th></tr></thead><tbody>";
+        for (var i = 0; i <= Data.length; i++)
         {     
-            Table += "<tr><td>"+Data[i].FirstName+"</td>"+"<td>"+Data[i].SecondName+"</td>"+"<td>"+Data[i].FirstLastName+"</td>"+"<td>"+Data[i].SecondLastName+"</td>"+"</tr>"+"<tbody>"+"</table>";
+            Table+="<tr><td>"+Data[i].FirstName+"</td>"+"<td>"+Data[i].SecondName+"</td>"+"<td>"+Data[i].FirstLastName+"</td>"+"<td>"+Data[i].SecondLastName+"</td>"+"</tr>"+"<tbody>"+"</table>";
             
         }
         return Table;
