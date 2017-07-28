@@ -10,6 +10,9 @@
 </style>
 
 
+<!-- DataTables JavaScript -->
+<script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <h2>Create</h2>
 
@@ -19,39 +22,70 @@
 
         $vDTable = $('#dTable').DataTable({
 
-            "order": [[1, 'asc']],
             responsive: true,
             "columnDefs": [
                 {
-                    "targets": [5, 6],
-                    "visible": false,
-                    "searchable": false
-
-                },
-
-                {
-                    "targets": [0, 7],
+                    "targets": [4],
                     "sortable": false
                 }
             ]
 
-        });  
+        });
+
+        $('tbody').on('click', '.glyphicon-trash', function () {
+            $vDTable.row($(this).parents("tr")).remove().draw();
+        });
+
+        $(document).on('click', '.glyphicon-folder-open', function () {
+            $('.modal-body input[type="text"]').val("");
+            DynamicModal(true);
+        });
+
+
+        $('tbody').on('click', '.glyphicon-edit', function () {
+            DynamicModal(false); 
+            var Parent = $(this).parents("tr");
+            var index = $vDTable.row(Parent).index();
+            var dataArray = $vDTable.row(index).data();
+            $("#firstInput").val(dataArray[0]);
+            $("#secondInput").val(dataArray[1]);
+            $("#thirdInput").val(dataArray[2]);
+            $("#fourthInput").val(dataArray[3]);
+            $("#hiddenInput").val(index);
+
+            $('#myModal').modal('show');
+        })
 
         $("#btnSave").click(function () {
 
-            if (validateMyForm()) {
-                var ObjP = {
-                    Title: $("#Title").val(),
-                    Description: $("#Description").val(),
-                    ImageURL: $("#ImageURL").val(),
-                    Publisher: $("#Publisher").val(),
-                    PublicationYear: $("#PublicationYear").val()
-                };
+            if (validateMyForm() && validateMyDTable()) {
+
+                var authors = [];
+
+                $($vDTable.rows().data()).each(function (index, row) {
+                    var authorObj = {
+                        FirstName: row[0],
+                        SecondName: row[1],
+                        FirstLastName: row[2],
+                        SecondLastName: row[3]
+                    }
+
+                    authors.push(authorObj);
+
+                });
+
 
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
-                    data: JSON.stringify(ObjP),
+                    data: JSON.stringify({
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageURL: $("#ImageURL").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val(),
+                        Authors: authors
+                    }),
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
                     success: function (Data) {
@@ -66,9 +100,23 @@
                     }
                 });
             }
-
-
         });
+
+        $('#btnEdit').click(function () {
+            if (validateMyModalForm()) {
+                var hidden = $("#hiddenInput").val();
+                $vDTable.row(hidden).data({
+                    firstInput: $("#firstInput").val(),
+                    secondInput: $("#secondInput").val(),
+                    thirdInput: $("#thirdInput").val(),
+                    fourthInput: $("#fourthInput").val(),
+                    Buttons: "<span class='glyphicon glyphicon-trash'> | </span>" +
+                    "<span class='glyphicon glyphicon-edit'></span>"
+                }).draw();
+                $("#myModal").modal("hide");
+            }
+        });
+
 
     });
 
@@ -78,9 +126,24 @@
         }
     }
 
+    function DynamicModal(flag) {
+        if (flag) {
+            $("#btnAdd").css("display", "inline");
+            $("#btnEdit").css("display", "none");
+        } else {
+            $("#btnEdit").css("display", "inline");
+            $("#btnAdd").css("display", "none");
+        }
+        $('#myModal').modal('show');
+    }
+
+    function SwapClass(ThisText, ClassR, ClassA) {
+        $(ThisText).removeClass(ClassR);
+        $(ThisText).addClass(ClassA);
+    }
     function validateMyForm() {
         var flag = true;
-        $("input[type='text']").each(function () {
+        $(".form-horizontal div input[type='text']").each(function () {
             if ($(this).val().trim() == "") {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
@@ -90,8 +153,7 @@
 
         })
 
-        $("input[type='number']").each(function () {
-            console.log($(this).val());
+        $(".form-horizontal div input[type='number']").each(function () {
             if ($(this).val().trim() == "" || $(this).val() <= 0) {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
@@ -102,14 +164,11 @@
         });
         return flag;
     }
-    function SwapClass(ThisText, ClassR, ClassA) {
-        $(ThisText).removeClass(ClassR);
-        $(ThisText).addClass(ClassA);
-    }
+
 
     function validateMyModalForm() {
         var flag = true;
-        $("#myModalForm div input[type='text']").each(function () {
+        $('#myModalForm div input[type="text"]').each(function () {
             if ($.trim(this.value) == "") {
                 $(this).addClass("Error");
                 flag = false;
@@ -120,24 +179,36 @@
         return flag;
     }
 
+    function validateMyDTable() {
+        var flag = true;
+
+        if ($vDTable != null) {
+            if ($vDTable.data().length <= 0) {
+                $(this).addClass("Error");
+                flag = false;
+            } else {
+                $(this).removeClass("Error");
+            }
+            return flag;
+        }
+    }
+
     function add() {
         if (validateMyModalForm()) {
             $vDTable.row.add([
-                "<span id='MoreInfoIcon' class='glyphicon glyphicon-plus-sign'></span>",
                 $("#firstInput").val(),
                 $("#secondInput").val(),
                 $("#thirdInput").val(),
                 $("#fourthInput").val(),
-                $("#fifthInput").val(),
-                $("#sixthInput").val(),
                 "<span class='glyphicon glyphicon-trash'></span> <span> | </span> " +
-                "<span class='glyphicon glyphicon-pencil' onclick='editMyRow(this)'></span>"
+                "<span class='glyphicon glyphicon-edit'></span>"
             ]).draw();
 
             $("#myModalForm div input[type='text']").val("");
             $("#btnClose").click();
         }
     }
+
 
 </script>
 
@@ -196,49 +267,32 @@
         </div>
     </div>
 
-    <div class="col-md-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Authors |
-                <span class="glyphicon glyphicon-folder-open" id="addRowGlyphicon" data-toggle="modal" data-target="#myModal">
-                </span>
-            </div>
-            <div class="panel-body">
-                <div>
-                    <div id="dTable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-                        <div class="row"><div class="col-sm-6"><div class="dataTables_length" id="dTable_length"><label>Show <select name="dTable_length" aria-controls="dTable" class="form-control input-sm"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> entries</label></div></div><div class="col-sm-6"><div id="dTable_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="dTable"></label></div></div></div><div class="row">
-                            <div class="col-sm-12">
-                                <table class="table dataTable no-footer" id="dTable" role="grid" aria-describedby="dTable_info">
-                                    <thead>
-                                        <tr role="row"><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Show More" style="width: 276px;">Show More</th><th class="sorting_asc" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="First Input: activate to sort column descending" style="width: 260px;">First Input</th><th class="sorting" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-label="Second Input: activate to sort column ascending" style="width: 316px;">Second Input</th><th class="sorting" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-label="Third Input: activate to sort column ascending" style="width: 274px;">Third Input</th><th class="sorting" tabindex="0" aria-controls="dTable" rowspan="1" colspan="1" aria-label="Fourth Input: activate to sort column ascending" style="width: 300px;">Fourth Input</th><th class="sorting_disabled" rowspan="1" colspan="1" aria-label="Buttons" style="width: 216px;">Buttons</th></tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="odd"><td valign="top" colspan="6" class="dataTables_empty">No data available in table</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="dataTables_info" id="dTable_info" role="status" aria-live="polite">Showing 0 to 0 of 0 entries</div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="dataTables_paginate paging_simple_numbers" id="dTable_paginate">
-                                    <ul class="pagination"><li class="paginate_button previous disabled" aria-controls="dTable" tabindex="0" id="dTable_previous"><a href="#">Previous</a></li><li class="paginate_button next disabled" aria-controls="dTable" tabindex="0" id="dTable_next"><a href="#">Next</a></li></ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="row">
+        <div class="panel-heading">
+            Authors |
+            <span class="glyphicon glyphicon-folder-open" id="addRowGlyphicon" data-toggle="modal" data-target="#myModal">
+            </span>
         </div>
+        <table id="dTable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th style="width: 200px;">First Name</th>
+                    <th style="width: 200px;">Second Name</th>
+                    <th style="width: 200px;">Lastname</th>
+                    <th style="width: 200px;">Surname</th>
+                    <th style="width: 200px;">Buttons</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+
+        </table>
     </div>
 
     <div class="modal" id="myModal">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="myModalHeadAdd">Add new Author</h4>
+                    <h4 class="modal-title" id="myModalHeadAdd">Author</h4>
                     <h4 class="modal-title" id="myModalHeadEdit" style="display:none">Edit Row</h4>
                 </div>
                 <div id="myModalBody" class="modal-body">

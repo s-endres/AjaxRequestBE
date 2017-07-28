@@ -74,8 +74,8 @@
             } else {
                 SwapIcon(this, FirstClass, SecondClass);
                 setDropTable(row);
-                row.child(format(Data)).show();
-                //row.child(format(row.data().Authors)).show(); -llamando directamente Author del objecto-
+                //row.child(format(Data)).show();
+                row.child(format(row.data().Authors)).show(); //-llamando directamente Author del objecto-
                 tr.addClass('shown');
             }
         });
