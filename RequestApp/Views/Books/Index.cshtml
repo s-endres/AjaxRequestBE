@@ -2,10 +2,7 @@
 
 @{
     ViewBag.Title = "Index";
-}
-<!-- Bootstrap Core CSS -->
-<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- MetisMenu CSS -->
+}<!-- MetisMenu CSS -->
 <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 <!-- DataTables CSS -->
 <link href="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
@@ -118,29 +115,43 @@
             var Index = $Table
                 .row(row)
                 .index();
+           
+            if (row.child.isShown())
+            {
+                ShowLogo(this, AClass, RClass);
+                row.child.hide();
+                Tr.removeClass('shown');
+                
+            }
+            else {
+                $.ajax({
+                    type: "GET",
+                    url: "http://localhost:61232/Books/getBookAuthors",
+                    data: { BookId: $Table.row(Index).data()[1] },
+                    dataType: "json",
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (data) {
+                        console.log(row.child(Format(data)));
+                        if (!data) {
+                            alert("Puto el que lo lea");
 
-            $.ajax({
-                type: "GET",
-                url: "http://localhost:61232/Books/getBookAuthors",
-                data: { BookId: $Table.row(Index).data()[1] },
-                dataType: "json",
-                contentType: 'application/json; charset=utf-8',
-                success: function (data) {
-                    console.log(row.child(Format(data)));
-                    if (!data) {
-                        row.child.hide();
-                        ShowLogo(this, AClass, RClass);
+                            
+                        }
+                        else {
+                            
+                            row.child(Format(data)).show();
+                            Tr.addClass('shown');
+
+                        }/**Sends the datatable row data to the Format method and show it**/
+
+                    },
+                    error: function () {
+                        alert("");
                     }
-                    else {
-                        ShowLogo(this, RClass, AClass);
-                        row.child(Format(data)).show();
-                    }/**Sends the datatable row data to the Format method and show it**/
-
-                },
-                error: function () {
-                    alert("");
-                }
-            });//Close GET Authors Ajax
+                });//Close GET Authors Ajax
+                ShowLogo(this, RClass, AClass);
+            }
+           
 
         });//Close Show More Function 
       
@@ -159,12 +170,14 @@
         }
     }
     function Format(Data) {
+        
         var Table = "<table><thead><tr><th>First Name</th><th>Second Name</th><th>First Last Name</th><th>Second Last Name</th></tr></thead><tbody>";
-        for (var i = 0; i <= Data.length; i++)
-        {     
-            Table+="<tr><td>"+Data[i].FirstName+"</td>"+"<td>"+Data[i].SecondName+"</td>"+"<td>"+Data[i].FirstLastName+"</td>"+"<td>"+Data[i].SecondLastName+"</td>"+"</tr>"+"<tbody>"+"</table>";
-            
-        }
+        $.each(Data, function (index, obj) {
+
+            console.log(obj.FirstName);
+            Table += "<tr><td>" + obj.FirstName + "</td>" + "<td>" + obj.SecondName + "</td>" + "<td>" + obj.FirstLastName + "</td>" + "<td>" + obj.SecondLastName + "</td>" + "</tr>" + "<tbody>" + "</table>";
+
+        });
         return Table;
     }
     function ShowLogo(pSelector, pRClass, pAClass) {
