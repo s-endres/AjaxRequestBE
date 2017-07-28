@@ -22,7 +22,13 @@
 <script>
     $(document).ready(function () {
 
-        $table = $('#datatable').dataTable({ responsive: true, "columnDefs": [{ "targets": [4], "orderable": false }] });
+        $table = $('#datatable').DataTable({
+            responsive: true,
+            "columnDefs": [{
+                "targets": [4],
+                "orderable": false
+            }]
+        });
 
         $("#btnSave").click(function () {
             createBook();
@@ -32,12 +38,24 @@
         $("#myModal").on('hidden.bs.modal', function () {
             cleanModalForm();
         })
+
+
+        $("#yesDelete").click(function () {
+            
+            $table.row($("#HiddenIndexDelete").val()).remove().draw();
+
+            var tableLength = $table.data().length;
+            if (tableLength == 0) {
+                $("#btnSave").prop("disabled", true);
+            }
+            $("#closeDeleteModal").click();
+        })
     });
 
     function AddAuthors() {
 
         if (validateMyModal()) {
-            var Data = [$("#dato1").val(), $("#dato2").val(), $("#dato3").val(), $("#dato4").val(), "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+            var Data = [$("#dato1").val(), $("#dato2").val(), $("#dato3").val(), $("#dato4").val(), "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow(this)\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow(this)\" class = \"glyphicon glyphicon-pencil\">"];
             $('#datatable').DataTable().row.add(Data).draw();
 
             $("#closeMyModal").click(); //Cerrar modal
@@ -45,32 +63,18 @@
         }
     }
 
-    function removeRow(bottom) {
+    function removeRow(button) {
 
-        var ActualRow = $(bottom).parents("tr");
-        DeleteAuthor(ActualRow);
+        var ActualRow = $(button).parents("tr");
+        var rowIndex = $table.row(ActualRow).index();
+        $("#HiddenIndexDelete").val(rowIndex);
     }
 
-    function DeleteAuthor(ActualRow) {
-
-        $("#yesDelete").click(function () {
-
-            $('#datatable').DataTable().row(ActualRow).remove().draw();
-
-            var tableLength = $('#datatable').DataTable().column(0).data().length;
-            if (tableLength == 0) {
-                $("#btnSave").prop("disabled", true);
-            }
-            $("#closeDeleteModal").click();
-        })
-    }
-
-
-    function editRow(bottom) {
+    function editRow(button) {
         $("#Add").css("display", "none");
         $("#edit").css("display", "inline");
         $("#titleModel").text("Edit Row");
-        var ActualRow = $(bottom).parents("tr");
+        var ActualRow = $(button).parents("tr");
         var rowIndex = $('#datatable').DataTable().row(ActualRow).index();
         var row = $('#datatable').DataTable().row(rowIndex).data()
         $("#dato1").val(row[0]);
@@ -84,7 +88,7 @@
     function editRowBotton() {
 
         if (validateMyModal()) {
-            var Data = [$("#dato1").val(), $("#dato2").val(), $("#dato3").val(), $("#dato4").val(), "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\"  onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+            var Data = [$("#dato1").val(), $("#dato2").val(), $("#dato3").val(), $("#dato4").val(), "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow(this)\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\"  onclick =\"editRow(this)\" class = \"glyphicon glyphicon-pencil\">"];
 
             $('#datatable').DataTable().row($("#HiddenIndex").val()).data(Data).draw();
 
@@ -341,6 +345,7 @@
 
                     <label for="usr">Are you sure you want to delete a row</label><br>
                     <button type="button" class="btn btn-default" id="yesDelete">yes</button>
+                    <input type="text" class="HiddenIndexx" id="HiddenIndexDelete" style="display:none"> </input>
                     <button type="button" class="btn btn-default" id="noDelete" data-dismiss="modal">No</button>
 
                     <div class="modal-footer">

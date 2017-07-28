@@ -37,7 +37,7 @@
 
                 $.each(data, function (index, item) {
 
-                    var array = ["<td> <button type=\"button\" class=\"glyphicon glyphicon-plus\" onclick = \"ShowChild((this))\"></button> </td>", item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+                    var array = ["<td> <button type=\"button\" class=\"glyphicon glyphicon-plus\" onclick = \"ShowChild(this)\"></button> </td>", item.BookId, item.Description, item.ImageUrl, item.PublicationYear, item.Publisher, item.Title, "<button type=\"button\" class=\"glyphicon glyphicon-trash\" onclick = \"removeRow(this)\"></button> <button type=\"button\" onclick =\"editRow(this)\" class = \"glyphicon glyphicon-pencil\">"];
                     $table.row.add(array).draw();
                 });
 
@@ -63,29 +63,29 @@
     function removeRow(button) {
 
         var actualRow = $(button).parents("tr");
-        deleteForm(actualRow);
+        var rowIndex = $table.row(actualRow).index();
+        var row = $table.row(rowIndex).data()
+        $("#HiddenIndexDelete").val(rowIndex);
+        deleteForm(row);
         $('#exampleModal').modal('show');
 
     }
 
 
-    function deleteForm(ActualRow) {
-
-        var rowIndex = $table.row(ActualRow).index();
-        var row = $table.row(rowIndex).data()
+    function deleteForm(Row) {
 
         $("#yesDelete").click(function () {
             $.ajax({
                 type: "DELETE",
                 url:" http://localhost:61232/Books/DeleteBook" ,
-                data: JSON.stringify({BookId:row[0]}),
+                data: JSON.stringify({ BookId: Row[1]}),
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
                 success: function (data) {
                     
                     if (data) {
-
-                       $table.row(ActualRow).remove().draw();
+                        
+                        $table.row($("#HiddenIndexDelete").val()).remove().draw();
                         ValidateMyAlert("Class='alert alert-success'", ' Complete', 'Success')
 
                     }
@@ -244,6 +244,7 @@
                 <label for="usr">Are you sure you want to delete a row</label><br>
                 <button type="button" class="btn btn-default" id="yesDelete">yes</button>
                 <button type="button" class="btn btn-default" id="noDelete" data-dismiss="modal">No</button>
+                <input type="text" class="HiddenIndexx" id="HiddenIndexDelete" style="display:none"> </input>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" id="closeDeleteModal">Close</button>
