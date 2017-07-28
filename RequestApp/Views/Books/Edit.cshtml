@@ -147,7 +147,7 @@
             var authorList = [];
             $("tbody tr").each(function (value, index) {
                 var rowIndex = $table.row(value).index();
-                var row = $table.DataTable().row(rowIndex).data()
+                var row = $table.row(rowIndex).data()
                 var obj = { FirstName: row[0], SecondName: row[1], FirstLastName: row[2], SecondLastName: row[3] }
                 authorList.push(obj);
             });
