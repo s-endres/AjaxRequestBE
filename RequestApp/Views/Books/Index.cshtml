@@ -57,7 +57,7 @@
         var actualRow = $(button).parents("tr");
         var rowIndex = $table.row(actualRow).index();
         var row = $table.row(rowIndex).data()
-        window.location.replace("http://localhost:61232/Books/Edit?variable=" + row[0]);
+        window.location.replace("http://localhost:61232/Books/Edit?variable=" + row[1]);
     }
 
     function removeRow(button) {
