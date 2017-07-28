@@ -33,7 +33,13 @@
 <script>
     $(document).ready(function () {
         $table = $('#myTable').DataTable({
-            responsive: true
+            responsive: true,
+            "columnDefs": [
+                {
+                    "targets": [4],
+                    "orderable": false
+                }
+            ]
         });
 
         $('#btnAdd').click(function () {
@@ -41,7 +47,7 @@
         });
 
         $('#myModal').on('hidden.bs.modal', function () {
-            $('input[class="form-control"]').val("");
+            $('#myModal input[class="form-control"]').val("");
         });
 
         $('#btnCreate').click(function () {
@@ -53,7 +59,8 @@
         });
 
         $("#btnSave").click(function () {
-            if (Validate(".form-horizontal") && $table.data().length > 0) {
+            if (Validate(".form-horizontal") && ValidateTable()) {
+                var Arreglo = GetAuthors();
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
@@ -122,10 +129,10 @@
         return validation;
     }
 
-    function AddRemove(idAdd, idRemove) {
+    function AddRemove(idAdd, Text) {
         if (!$("#" + idAdd).length) {
-            $("#" + idRemove).remove();
-            $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>No me agregué.</div >');
+            $(".alert").remove();
+            $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>' + Text + '</div >');
         }
     }
 
@@ -150,10 +157,27 @@
     }
 
     function GetAuthors() {
-        //var Arreglo[];
-        //for (var i = 0; i < $table.length; i++) {
-        //    Arreglo.push($table.data()[i]);
-        //}
+        var Arreglo = [];
+        for (var i = 0; i < $table.data().length; i++) {
+            console.log($table.data()[i])
+            var Author = {
+                FirstName: $table.data()[i][0],
+                SecondName: $table.data()[i][1],
+                FirstLastName: $table.data()[i][2],
+                SecondLastName: $table.data()[i][3]
+            };
+            Arreglo.push(Author);
+        }
+        console.log(Arreglo);
+        return Arreglo;
+    }
+
+    function ValidateTable() {
+        if ($table.data().length == 0) {
+            AddRemove("Table", "Agregue autores");
+            return false;
+        }
+        return true;
     }
 </script>
 
@@ -206,7 +230,7 @@
         </div>
     </div>
 
-    <table id="myTable">
+    <table id="myTable" width="100%">
         <thead>
             <tr>
                 <th>First Name</th>
@@ -236,19 +260,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="IdFirstInput">First Input:</label>
+                        <label for="IdFirstInput">First Name:</label>
                         <input type="text" class="form-control" id="IdFirstInput">
                     </div>
                     <div class="form-group">
-                        <label for="IdSecondInput">Second Input:</label>
+                        <label for="IdSecondInput">Second Name:</label>
                         <input type="text" class="form-control" id="IdSecondInput">
                     </div>
                     <div class="form-group">
-                        <label for="IdThirdInput">Third Input:</label>
+                        <label for="IdThirdInput">Last Name:</label>
                         <input type="text" class="form-control" id="IdThirdInput">
                     </div>
                     <div class="form-group">
-                        <label for="IdFourthInput">Fourth Input:</label>
+                        <label for="IdFourthInput">Surname:</label>
                         <input type="text" class="form-control" id="IdFourthInput">
                     </div>
                     <input type="text" class="form-control" id="hidden">
