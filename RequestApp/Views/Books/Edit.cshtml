@@ -44,7 +44,20 @@
                     $("#Description").val(Data.Description);
                     $("#ImageUrl").val(Data.ImageUrl);
                     $("#Publisher").val(Data.Publisher);
-                    $("#PublicationYear").val(Data.PublicationYear); 
+                    $("#PublicationYear").val(Data.PublicationYear);
+                    var AuthorsData = [];
+                    for (var i = 0; i < Data.Authors.length; i++) {
+                        var AuthorsArray = [
+                            Data.Authors[i].FirstName,
+                            Data.Authors[i].SecondName,
+                            Data.Authors[i].FirstLastName,
+                            Data.Authors[i].SecondLastName,
+                            "<span class='glyphicon glyphicon-edit'> | </span>" +
+                            "<span class='glyphicon glyphicon-trash'></span>"
+                        ];
+                        AuthorsData.push(AuthorsArray);
+                    }
+                    $eDTable.rows.add(AuthorsData).draw();
                 } else {
                     pError();
                 }
@@ -58,115 +71,69 @@
             $eDTable.row($(this).parents("tr")).remove().draw();
         });
 
-        $('tbody').on('click', '.glyphicon-folder-open', function () {
+        $(document).on('click', '.glyphicon-folder-open', function () {
+            $('.modal-body input[type="text"]').val("");
             DynamicModal(true);
         });
 
-
         $('tbody').on('click', '.glyphicon-edit', function () {
+
+            var Parent = $(this).parents("tr");
+            var index = $eDTable.row(Parent).index();
+            var dataArray = $eDTable.row(index).data();
+            $("#firstInput").val(dataArray[0]);
+            $("#secondInput").val(dataArray[1]);
+            $("#thirdInput").val(dataArray[2]);
+            $("#fourthInput").val(dataArray[3]);
+            $("#hiddenInput").val(index);
+
             DynamicModal(false);
-            $('#myModal').modal('show'); 
         })
 
-        $('#btnEdit').on('click', function () {
-
+        $("#btnEdit").click(function () {
             if (validateMyForm() && validateMyDTable()) {
+                var AuthorsArray = [];
 
-                var authors = [];
-
-                $($eDTable.rows().data()).each(function (index, row) {
-                    var authorObj = {
-                        FirstName: row[0],
-                        SecondName: row[1],
-                        FirstLastName: row[2],
-                        SecondLastName: row[3]
-                    }
-
-                    authors.push(authorObj);
-
-                });
+                for (var i = 0; i < $eDTable.data().length; i++) {
+                    var Authors = {
+                        FirstName: $eDTable.data()[i][0],
+                        SecondName: $eDTable.data()[i][1],
+                        FirstLastName: $eDTable.data()[i][2],
+                        SecondLastName: $eDTable.data()[i][3]
+                    };
+                    AuthorsArray.push(Authors);
+                }
 
                 $.ajax({
-                    type: "GET",
-                    url: "http://localhost:61232/Books/getSingleBook",
+                    type: "PUT",
+                    url: "http://localhost:61232/Books/UpdateBook",
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
-                    data: { bookId: $.urlParam("bookId") },
+                    data: JSON.stringify({
+                        BookId: parseInt($.urlParam("BookId")),
+                        Title: $("#Title").val(),
+                        Description: $("#Description").val(),
+                        ImageUrl: $("#ImageUrl").val(),
+                        Publisher: $("#Publisher").val(),
+                        PublicationYear: $("#PublicationYear").val(),
+                        Authors: AuthorsArray
+                    }),
                     success: function (data) {
-                        if (data === false) {
+                        if (data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
-                            $("#Title").val(data.Title);
-                            $("#Description").val(data.Description);
-                            $("#ImageUrl").val(data.ImageUrl);
-                            $("#Publisher").val(data.Publisher);
-                            $("#PublicationYear").val(data.PublicationYear);
-                            var Data = [];
-                            for (var i = 0; i < data.Authors.length; i++) {
-                                var Array = [
-                                    data.Authors[i].FirstName,
-                                    data.Authors[i].SecondName,
-                                    data.Authors[i].FirstLastName,
-                                    data.Authors[i].SecondLastName,
-                                    "<span class='glyphicon glyphicon-remove-circle'> | </span>" +
-                                    "<span class='glyphicon glyphicon-ok-circle'></span>"
-                                ];
-                                Data.push(Array);
-                            }
-                            $edTable.rows.add(Data).draw();
+                           
                         }
                     },
                     error: function () {
-                        window.location.replace("http://localhost:61232/Books/");
-                    }
-                });
-
-                $("#btnEdit").click(function () {
-                    if (validateMyForm && validateMyDTable()) {
-                        var authors = [];
-
-                        for (var i = 0; i < $edTable.data().length; i++) {
-                            var authorObj = {
-                                FirstName: $edTable.data()[i][0],
-                                SecondName: $edTable.data()[i][1],
-                                FirstLastName: $edTable.data()[i][2],
-                                SecondLastName: $edTable.data()[i][3]
-                            };
-                            authors.push(authorObj);
-                        } 
-
-                        $.ajax({
-                            type: "PUT",
-                            url: "http://localhost:61232/Books/UpdateBook",
-                            dataType: "json",
-                            contentType: 'application/json; charset=utf-8',
-                            data: JSON.stringify({
-                                BookId: parseInt($.urlParam("bookId")),
-                                Title: $("#Title").val(),
-                                Description: $("#Description").val(),
-                                ImageUrl: $("#ImageUrl").val(),
-                                Publisher: $("#Publisher").val(),
-                                PublicationYear: $("#PublicationYear").val(),
-                                Authors: authors()
-                            }),
-                            success: function (data) {
-                                if (data) {
-                                    window.location.replace("http://localhost:61232/Books/");
-                                } else {
-                                    pError();
-                                }
-                            },
-                            error: function () {
-                                pError();
-                            }
-                        });
+                       
                     }
                 });
             }
-
         });
+
     });
-     
+
     function pError() {
         if (!$("p[class='ErrorClass']").length) {
             $(".form-horizontal").append("<p class='ErrorClass' style='color: red;'>An error has occurred while loading the data </p>");
@@ -190,8 +157,9 @@
 
     function validateMyModalForm() {
         var flag = true;
-        $('#myModalForm div input[type="text"]').each(function () {
-            if ($.trim(this.value) == "") {
+
+        $('#myModalForm :input').each(function () {
+            if ($(this).val().trim() == "") {
                 $(this).addClass("Error");
                 flag = false;
             } else {
@@ -203,7 +171,7 @@
 
     function validateMyForm() {
         var flag = true;
-        $("input[type='text']").each(function () {
+        $('.form-horizontal div input[type="text"]').each(function () {
             if ($(this).val().trim() == "") {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
@@ -213,7 +181,7 @@
 
         })
 
-        $("input[type='number']").each(function () { 
+        $('.form-horizontal div input[type="text"]').each(function () {
             if ($(this).val().trim() == "" || $(this).val() <= 0) {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
@@ -236,8 +204,8 @@
                 $("#secondInput").val(),
                 $("#thirdInput").val(),
                 $("#fourthInput").val(),
-                "<span class='glyphicon glyphicon-trash'></span> <span> | </span> " +
-                "<span class='glyphicon glyphicon-edit'  ></span>"
+                "<span class='glyphicon glyphicon-edit'> | </span>" +
+                "<span class='glyphicon glyphicon-trash'></span>"
             ]).draw();
 
             $("#myModalForm div input[type='text']").val("");
@@ -247,32 +215,34 @@
 
     function edit() {
         if (validateMyModalForm()) {
-            $eDTable.row.add([
+            var hidden = $("#hiddenInput").val();
+            $eDTable.row(hidden).data([
                 $("#firstInput").val(),
                 $("#secondInput").val(),
                 $("#thirdInput").val(),
                 $("#fourthInput").val(),
-                "<span class='glyphicon glyphicon-trash'></span> <span> | </span> " +
-                "<span class='glyphicon glyphicon-edit'></span>"
-            ]).draw();
+                "<span class='glyphicon glyphicon-edit'> | </span>" +
+                "<span class='glyphicon glyphicon-trash'></span>"
 
-            $("#myModalForm div input[type='text']").val("");
-            $("#btnClose").click();
+            ]).draw();
+            $("#myModal").modal("hide");
         }
     }
 
     function DynamicModal(flag) {
         if (flag) {
             $("#btnAdd").css("display", "inline");
-            $("#btnEdit").css("display", "none");
+            $("#btnEdit2").css("display", "none");
         } else {
-            $("#btnEdit").css("display", "inline");
+            $("#btnEdit2").css("display", "inline");
             $("#btnAdd").css("display", "none");
         }
         $('#myModal').modal('show');
     }
 
 </Script>
+
+
 
 @using (Html.BeginForm())
 {
@@ -357,7 +327,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="myModalHeadAdd">Author</h4>
-                    <h4 class="modal-title" id="myModalHeadEdit" style="display:none">Edit Row</h4>
                 </div>
                 <div id="myModalBody" class="modal-body">
                     <form id="myModalForm">
@@ -384,7 +353,7 @@
                 <div class="modal-footer">
                     <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" id="btnAdd" class="btn btn-primary" onclick="add()">Add Author</button>
-                    <button type="button" id="btnEdit" class="btn btn-primary" style="display:none" onclick="edit()">Edit</button>
+                    <button type="button" id="btnEdit2" class="btn btn-primary" style="display:none" onclick="edit()">Edit</button>
                 </div>
             </div>
         </div>

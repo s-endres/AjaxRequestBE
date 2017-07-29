@@ -21,7 +21,7 @@
 
 
         $vDTable = $('#dTable').DataTable({
-
+            
             responsive: true,
             "columnDefs": [
                 {
@@ -51,9 +51,7 @@
             $("#secondInput").val(dataArray[1]);
             $("#thirdInput").val(dataArray[2]);
             $("#fourthInput").val(dataArray[3]);
-            $("#hiddenInput").val(index);
-
-            $('#myModal').modal('show');
+            $("#hiddenInput").val(index); 
         })
 
         $("#btnSave").click(function () {
@@ -105,14 +103,14 @@
         $('#btnEdit').click(function () {
             if (validateMyModalForm()) {
                 var hidden = $("#hiddenInput").val();
-                $vDTable.row(hidden).data({
-                    firstInput: $("#firstInput").val(),
-                    secondInput: $("#secondInput").val(),
-                    thirdInput: $("#thirdInput").val(),
-                    fourthInput: $("#fourthInput").val(),
-                    Buttons: "<span class='glyphicon glyphicon-trash'> | </span>" +
+                $vDTable.row(hidden).data([
+                    $("#firstInput").val(),
+                    $("#secondInput").val(),
+                    $("#thirdInput").val(),
+                    $("#fourthInput").val(),
+                    "<span class='glyphicon glyphicon-trash'></span> <span> | </span> " +
                     "<span class='glyphicon glyphicon-edit'></span>"
-                }).draw();
+                ]).draw();
                 $("#myModal").modal("hide");
             }
         });
