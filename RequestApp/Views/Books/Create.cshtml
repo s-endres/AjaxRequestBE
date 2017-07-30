@@ -21,7 +21,7 @@
 
 
         $vDTable = $('#dTable').DataTable({
-            
+
             responsive: true,
             "columnDefs": [
                 {
@@ -33,17 +33,25 @@
         });
 
         $('tbody').on('click', '.glyphicon-trash', function () {
-            $vDTable.row($(this).parents("tr")).remove().draw();
+            $("#myDeleteModal").modal();
+            var RowHTML = $(this).parents('tr');
+            $("#hiddenInput").val($vDTable.row(RowHTML).index());
+        });
+
+        $('#deleteBtn').click(function () {
+            var rowIndex = $("#hiddenInput").val();
+            $vDTable.row(rowIndex).remove().draw();
+            
         });
 
         $(document).on('click', '.glyphicon-folder-open', function () {
-            $('.modal-body input[type="text"]').val("");
+            $('.modal-body input[type="text"]').val("").parent().removeClass("has-success");
             DynamicModal(true);
         });
 
 
         $('tbody').on('click', '.glyphicon-edit', function () {
-            DynamicModal(false); 
+            DynamicModal(false);
             var Parent = $(this).parents("tr");
             var index = $vDTable.row(Parent).index();
             var dataArray = $vDTable.row(index).data();
@@ -51,7 +59,7 @@
             $("#secondInput").val(dataArray[1]);
             $("#thirdInput").val(dataArray[2]);
             $("#fourthInput").val(dataArray[3]);
-            $("#hiddenInput").val(index); 
+            $("#hiddenInput").val(index);
         })
 
         $("#btnSave").click(function () {
@@ -133,6 +141,7 @@
             $("#btnAdd").css("display", "none");
         }
         $('#myModal').modal('show');
+        
     }
 
     function SwapClass(ThisText, ClassR, ClassA) {
@@ -166,12 +175,12 @@
 
     function validateMyModalForm() {
         var flag = true;
-        $('#myModalForm div input[type="text"]').each(function () {
-            if ($.trim(this.value) == "") {
-                $(this).addClass("Error");
+        $('#myModal div input[type="text"]:not(#hiddenInput)').each(function () {
+            if ($(this).val().trim() == "") {
+                $(this).parent().addClass("has-error").removeClass("has-success");
                 flag = false;
             } else {
-                $(this).removeClass("Error");
+                $(this).parent().addClass("has-success").removeClass("has-error");
             }
         });
         return flag;
@@ -181,14 +190,14 @@
         var flag = true;
 
         if ($vDTable != null) {
-            if ($vDTable.data().length <= 0) {
-                $(this).addClass("Error");
-                flag = false;
-            } else {
-                $(this).removeClass("Error");
+            if (!$('.alert-danger').length) {
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>At least one author is required</div>");
             }
-            return flag;
+            flag = false;
+        } else {
+            $('.alert-danger').remove();
         }
+        return flag;
     }
 
     function add() {
@@ -198,12 +207,14 @@
                 $("#secondInput").val(),
                 $("#thirdInput").val(),
                 $("#fourthInput").val(),
-                "<span class='glyphicon glyphicon-trash'></span> <span> | </span> " +
-                "<span class='glyphicon glyphicon-edit'></span>"
+                "<span class='glyphicon glyphicon-edit'> | </span>" +
+                "<span class='glyphicon glyphicon-trash'></span>"
             ]).draw();
-
-            $("#myModalForm div input[type='text']").val("");
+            
             $("#btnClose").click();
+            if ($('.alert-danger').length) {
+                $('.alert-danger').remove();
+            }
         }
     }
 
@@ -319,6 +330,26 @@
                     <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" id="btnAdd" class="btn btn-primary" onclick="add()">Add Author</button>
                     <button type="button" id="btnEdit" class="btn btn-primary" style="display:none">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="modal fade" id="myDeleteModal" role="checkbox">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Delete Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Sure you want to delete?</p>
+                        <input type="text" class="form-control" style="display:none" id="hiddenInput">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="deleteBtn" data-dismiss="modal">Delete</button>
+                        <button type="button" class="btn btn-default" id="cancelBtn" data-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>

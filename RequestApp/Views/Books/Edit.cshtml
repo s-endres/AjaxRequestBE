@@ -67,13 +67,22 @@
             }
         });
 
-        $('tbody').on('click', '.glyphicon-trash', function () {
-            $eDTable.row($(this).parents("tr")).remove().draw();
+        $(document).on('click', '.glyphicon-folder-open', function () {
+            $('.modal-body input[type="text"]').val("").parent().removeClass("has-success");
+            DynamicModal(true);
         });
 
-        $(document).on('click', '.glyphicon-folder-open', function () {
-            $('.modal-body input[type="text"]').val("");
-            DynamicModal(true);
+        $('tbody').on('click', '.glyphicon-trash', function () {
+            $("#myDeleteModal").modal();
+            var RowHTML = $(this).parents('tr');
+            $("#hiddenInput").val($eDTable.row(RowHTML).index());
+        });
+
+        $('#deleteBtn').click(function () {
+            var rowIndex = $("#hiddenInput").val();
+            $eDTable.row(rowIndex).remove().draw();
+            console.log(rowIndex);
+            //$eDTable.row($(rowIndex).parents("tr")).remove().draw();
         });
 
         $('tbody').on('click', '.glyphicon-edit', function () {
@@ -122,11 +131,11 @@
                         if (data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
-                           
+
                         }
                     },
                     error: function () {
-                       
+
                     }
                 });
             }
@@ -145,10 +154,12 @@
 
         if ($eDTable != null) {
             if ($eDTable.data().length <= 0) {
-                $(this).addClass("Error");
+                if (!$('.alert-danger').length) {
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>At least one author is required</div>");
+                } 
                 flag = false;
             } else {
-                $(this).removeClass("Error");
+                $('.alert-danger').remove();
             }
             return flag;
 
@@ -158,12 +169,12 @@
     function validateMyModalForm() {
         var flag = true;
 
-        $('#myModalForm :input').each(function () {
+        $('#myModal div input[type="text"]:not(#hiddenInput)').each(function () {
             if ($(this).val().trim() == "") {
-                $(this).addClass("Error");
+                $(this).parent().addClass("has-error").removeClass("has-success");
                 flag = false;
             } else {
-                $(this).removeClass("Error");
+                $(this).parent().addClass("has-success").removeClass("has-error");
             }
         });
         return flag;
@@ -210,6 +221,9 @@
 
             $("#myModalForm div input[type='text']").val("");
             $("#btnClose").click();
+            if ($('.alert-danger').length) {
+                $('.alert-danger').remove();
+            } 
         }
     }
 
@@ -354,6 +368,26 @@
                     <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="button" id="btnAdd" class="btn btn-primary" onclick="add()">Add Author</button>
                     <button type="button" id="btnEdit2" class="btn btn-primary" style="display:none" onclick="edit()">Edit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="modal fade" id="myDeleteModal" role="checkbox">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Delete Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Sure you want to delete?</p>
+                        <input type="text" class="form-control" style="display:none" id="hiddenInput">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="deleteBtn" data-dismiss="modal">Delete</button>
+                        <button type="button" class="btn btn-default" id="cancelBtn" data-dismiss="modal">Cancel</button>
+                    </div>
                 </div>
             </div>
         </div>
