@@ -3,11 +3,114 @@
 @{
     ViewBag.Title = "Edit";
 }
+<!-- Select2 -->
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css"> 
+<script src="/bower_components/select2/js/select2.min.js"></script>
 
 <h2>Edit</h2>
 
 <Script>
-    
+    $(document).ready(function () {
+        $("#btnEdit").click(function () {
+            doPut();
+        });
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data != false) {
+                    $.each(data, function () {
+                        $("#select2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
+                    });
+                } else {
+                    alert('Wops ERROR O.O" ');
+                }
+            },
+            error: function () {
+                alert('Wops ERROR O.O" ');
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data != false) {
+                    $.each(data, function () {
+                        $("#select1").append("<option value='" + this.StatusId + "'>" + this.Name + "</option>");
+                    });
+                } else {
+                    alert('Wops ERROR O.O" ');
+                }
+            },
+            error: function () {
+                alert('Wops ERROR O.O" ');
+            }
+        });
+
+        $("#select2").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+
+        $("#select1").select2({
+            placeholder: "select a value"
+        })
+
+        $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+            return results[1] || 0;
+        }
+        $.get('http://localhost:61232/Books/getSingleBook?BookId=' + $.urlParam('bookId'), function (data) {
+            $("#BookId").val(data.BookId);
+            $("#Title").val(data.Title);
+            $("#Description").val(data.Description);
+            $("#ImageUrl").val(data.ImageUrl);
+            $("#Publisher").val(data.Publisher);
+            $("#PublicationYear").val(data.PublicationYear);
+            $("#select2").val(data.GenreIds).trigger('change');
+            $("#select1").val(data.StatusId).trigger('change');
+        });
+
+    }); // End Document ready
+
+    function doPut() {
+        $.ajax({
+            type: "PUT",
+            url: "http://localhost:61232/Books/UpdateBook",
+            data: JSON.stringify({
+                BookId: parseInt($("#BookId").val()),
+                Title: $("#Title").val(),
+                Description: $("#Description").val(),
+                ImageUrl: $("#ImageUrl").val(),
+                Publisher: $("#Publisher").val(),
+                PublicationYear: parseInt($("#PublicationYear").val()),
+                GenreIds: $("#select2").val(),
+                StatusId: $("#select1").val()
+            }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data) {
+                    window.location.replace("http://localhost:61232/Books/");
+                } else {
+                    alert('Wops ERROR O.O" ');
+                }
+            },
+            error: function () {
+                alert('Wops ERROR O.O" ');
+            }
+        });
+    }
+
 </Script>
 
 @using (Html.BeginForm())
@@ -57,6 +160,20 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.PublicationYear, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Genres</label>
+            <div class="col-md-10">
+                <select id="select2" class="form-control" multiple></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Status</label>
+            <div class="col-md-10">
+                <select id="select1" class="form-control"></select>
             </div>
         </div>
 

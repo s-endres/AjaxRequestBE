@@ -4,10 +4,14 @@
 @{
     ViewBag.Title = "Create";
 }
+
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css"> 
 <!-- DataTables CSS -->
 <link href="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
 <!-- DataTables Responsive CSS -->
 <link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+<!-- Select2 -->
+<script src="/bower_components/select2/js/select2.min.js"></script>
 
 <h2>Create</h2>
 
@@ -17,7 +21,59 @@
             doPost();
         });
 
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data != false) {
+                    $.each(data, function () {
+                        console.log(this.GenreId);
+                        $("#select2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
+                    });
+                } else {
+                    alert('Wops ERROR O.O" ');
+                }
+            },
+            error: function () {
+                alert('Wops ERROR O.O" ');
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data != false) {
+                    $.each(data, function () {
+                        console.log(this.GenreId);
+                        $("#select1").append("<option value='" + this.StatusId + "'>" + this.Name + "</option>");
+                    });
+                } else {
+                    alert('Wops ERROR O.O" ');
+                }
+            },
+            error: function () {
+                alert('Wops ERROR O.O" ');
+            }
+        });
+
     });
+    
+    $("#select2").select2({
+        placeholder: "Select a genre",
+        allowClear: true
+    });
+
+    $("#select1").select2({
+        placeholder: "select a value"
+    })
 
     function doPost() {
 
@@ -41,7 +97,9 @@
                 ImageUrl: $("#ImageUrl").val(),
                 Publisher: $("#Publisher").val(),
                 PublicationYear: parseInt($("#PublicationYear").val()),
-                Authors: authorsList
+                Authors: authorsList,
+                GenreIds: $("#select2").val(),
+                StatusId: $("#select1").val()
             }),
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
@@ -105,6 +163,21 @@
             <div class="col-md-10">
                 <input type="number" id="PublicationYear" name="PublicationYear" class="form-control"/>
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Genres</label>
+            <div class="col-md-10">
+                <select id="select2" class="form-control" multiple>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Status</label>
+            <div class="col-md-10">
+                <select id="select1" class="form-control"></select>
             </div>
         </div>
 
