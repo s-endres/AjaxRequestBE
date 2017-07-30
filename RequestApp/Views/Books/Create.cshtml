@@ -3,14 +3,43 @@
 @{
     ViewBag.Title = "Create";
 }
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+
+<!-- MetisMenu CSS -->
+<link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+<!-- DataTables CSS -->
+<link href="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+<!-- DataTables Responsive CSS -->
+<link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<!-- DataTables JavaScript -->
+<script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
 <h2>Create</h2>
 
 <script>
-    $("document").ready(function(){
+    $("document").ready(function () {
+        $table = $("#MainTable").DataTable({
+
+            "columnDefs":
+            [
+               
+                
+            ],
+            "order": [[1, "asc"]],
+
+        });
+
+
+
 
         $("#btnSave").click(function () {
-            if (ValidateForm()) {
+            
+            if (ValidateForm(".form-horizontal")) {
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
@@ -19,35 +48,58 @@
                         Description: $("#Description").val(),
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
-                        PublicationYear: $("#PublicationYear").val()
+                        PublicationYear: $("#PublicationYear").val(),
+                        authors: AuthorsMethod()
                     }),
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
                     success: function (Pdata) {
                         if (Pdata) {
-
-                            if (!$('div[class="alert-info"]').length) {
-                                $(".form-group").prepend('<div class="alert alert-info">< strong > Dudeee!</strong >Success inserting the data</div >');
-                            }
                             window.location.replace("http://localhost:61232/Books/");
                         }
                         else {
 
                             if (!$('div[class="alert-danger"]').length) {
-                                $(".form-group").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Failed inserting the data</div >');
+                                $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Failed inserting the data</div>');
                             }
                         }
                     },
                     error: function () {
-
+                        WarningMessage();
                     }
                 });
             }
-        })
-    });
-    function ValidateForm() {
+        });//Closes POST Ajax method
+
+        $("#AddRow").click(function () {
+
+            var Data = [
+                $("#FirstName").val(),
+                $("#SecondName").val(),
+                $("#FirstLastName").val(),
+                $("#SecondLastName").val(),
+            ];
+            var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
+          
+            $("#MainTable").DataTable()
+            .row
+            .add(Data)
+            .draw();
+            $("#myModal").modal("hide");
+        });//Closes Add Row function
+
+    });//Close Document Ready
+
+
+    //-------------------FUNCTIONS SECTION-------------------//
+    function WarningMessage() {
+        if (!$('div[class="alert-danger"]').length) {
+            $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
+        }
+    }
+    function ValidateForm(Zone) {
         var Error = true;
-        $(".form-control").not("#hidden").each(function () {
+        $(Zone +" .form-control").not("#hidden").each(function () {
             if ($(this).val().trim() == "" || $(this).val() < 0) {
                 $(this).addClass("Error");
                 Error = false;
@@ -58,12 +110,55 @@
         });
         return Error;
     }
+    function CloseModal() {
+        $("#myModal").modal("hide");
+        $(".form-control").not(".Data").val("");
+    }
+    function OpenModal()
+    {
+        $("#myModal").modal()
+    }
+    //function Format(Data) {
+    //    var Table = "<table><thead><tr><th>First Name</th><th>Second Name</th><th>First Last Name</th><th>Second Last Name</th></tr></thead><tbody>";
+    //    Table += "<tr><td>" + Data[0] + "</td>" + "<td>" + Data[1] + "</td>" + "<td>" + Data[2] + "</td>" + "<td>" + Data[3] + "</td>" + "</tr>" + "<tbody>" + "</table>";
+    //    return Table;
+    //}
+    function AuthorsMethod()
+    {
+        var ArrayAuthors = [];                                                                                                                                                        
+
+        var TableData = $table.data();
+        for (var i = 0; i < TableData.length;i++)
+        {
+            //console.log(TableData[i][0]);
+            var ObjData = { FirstName: TableData[i][0], SecondName: TableData[i][1], FirstLastName: TableData[i][2], SecondLastName: TableData[i][3] };
+            ArrayAuthors.push(ObjData);
+        }
+        return ArrayAuthors;
+    }
 </script>
+
+
+
 <style>
     .Error {
         border: solid 1px red;
     }
+    #hidden {
+        display: none;
+    }
 </style>
+
+
+
+
+
+
+
+
+
+
+
 
 
 @using (Html.BeginForm()) 
@@ -120,8 +215,75 @@
             </div>
         </div>
     </div>
-}
 
+
+}
+   <!--------------------------MAIN TABLE-------------------------->
+<div class="container">
+
+    Add Row | <span><button id="AddRowModal" class="btn btn-success btn btn-default glyphicon glyphicon-plus-sign" type="button" onclick="OpenModal()"></button></span>
+    <table id="MainTable" class="table table-striped table-bordered" cellspacing="0">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Second Name</th>
+                <th>First Last Name</th>
+                <th>Second Last Name</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+    <br>
+    <button class="btn btn-success btn-block" id="ShowData">Show my data</button>
+    </br>
+    <!--------------------------MAIN TABLE-------------------------->
+    <!------------------------------------MODAL------------------------------------->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-add"></span> Add Authors Information :3</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="usrname"><span class="glyphicon glyphicon-user"></span> First Name</label>
+                            <input type="text" class="form-control" id="FirstName" placeholder="Enter First Value">
+                        </div>
+                        <div class="form-group">
+                            <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Name</label>
+                            <input type="text" class="form-control" id="SecondName" placeholder="Enter Second Value">
+                        </div>
+                        <div class="form-group">
+                            <label for="usrname"><span class="glyphicon glyphicon-user"></span> First Last Name</label>
+                            <input type="text" class="form-control" id="FirstLastName" placeholder="Enter Third Value">
+                        </div>
+                        <div class="form-group">
+                            <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Last Name</label>
+                            <input type="text" class="form-control" id="SecondLastName" placeholder="Enter Fourth Value">
+                        </div>
+                             <input type="text" id="hidden">
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success btn-block" id="AddRow"><span class="glyphicon glyphicon-record"></span> Add the row</button>
+                    <!--<button type="submit" class="btn btn-success btn-block Display" id="EditRow"><span class="glyphicon glyphicon-record"></span> Edit the row</button>-->
+                    <button type="submit" class="btn btn-success btn-block" id="CloseModal" onclick="CloseModal()"><span class="glyphicon glyphicon-remove-circle"></span> Cancel </button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <!------------------------------------MODAL------------------------------------->
+
+</div>
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
