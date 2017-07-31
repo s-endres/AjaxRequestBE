@@ -26,15 +26,15 @@
         $table = $("#MainTable").DataTable({
 
         });
-
-
         $.urlParam = function (pName) {
             var results = new RegExp('[\?&]' + pName + '=([^&#]*)').exec(window.location.href);
             return results[1] || 0;
         }
         BookObject = { BookId: $.urlParam("BookId") };
-
         $("tbody").on("click", ".glyphicon-ok-circle", function () {
+            $("#AddRow").css("display", "none");
+            $("#EditRow").css("display", "inline");
+            
             var Row = $(this).parents("tr");
             var Index = $table.row(Row).index();
             var Data = $table.row(Index).data();
@@ -45,7 +45,7 @@
             $("#SecondLastName").val(Data[3]);
             $("#hidden").val(Index);
             $("#myModal").modal();
-        });//Print the row data in the modal  
+        });//Print the row data in the modal
         $("tbody").on("click", ".glyphicon-remove-circle", function () {
             var Row = $(this).parents("tr");
             var Index = $table.row(Row).index();
@@ -54,18 +54,17 @@
             console.log("jaja saludos");
             $("#myDeleteModal").modal();
 
-        });
+        });//Removes the data from teh data table
         $("#YesDelete").click(function () {
             $("#myDeleteModal").modal("hide");
             $table
-            .row($("#hidden2").val())
-            .remove()
-            .draw();
-        });
+                .row($("#hidden2").val())
+                .remove()
+                .draw();
+        })//Confirmation Modal Delete;
         $("#NoDelete").click(function () {
             $("#myDeleteModal").modal("hide");
-        });
-        
+        });//Confirmation Modal
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/getSingleBook",
@@ -76,28 +75,24 @@
                 console.log(Data);
                 var DataArray = [];
                 var Authors = Data.Authors;
-                for (i = 0; i < Authors.length; i++)
-                {
+                for (i = 0; i < Authors.length; i++) {
                     var ArrayAuthors =
-                    [
-                       Authors[i].FirstName, Authors[i].SecondName, Authors[i].FirstLastName, Authors[i].SecondLastName, "<span class='glyphicon glyphicon-remove-circle'> |</span><span class='glyphicon glyphicon-ok-circle'></span>"
-                    ]
+                        [
+                            Authors[i].FirstName, Authors[i].SecondName, Authors[i].FirstLastName, Authors[i].SecondLastName, "<span class='glyphicon glyphicon-remove-circle'> |</span><span class='glyphicon glyphicon-ok-circle'></span>"
+                        ]
                     $table.row.add(ArrayAuthors).draw()
-                }             
+                }
                 $("#Description").val(Data.Description),
-                $("#ImageUrl").val(Data.ImageUrl),
-                $("#PublicationYear").val(Data.PublicationYear),
-                $("#Publisher").val(Data.Publisher),
-                $("#Title").val(Data.Title)
-              
+                    $("#ImageUrl").val(Data.ImageUrl),
+                    $("#PublicationYear").val(Data.PublicationYear),
+                    $("#Publisher").val(Data.Publisher),
+                    $("#Title").val(Data.Title)
+
             },
             error: function () {
                 WarningMessage();
             }
         });//Close GET Ajax
-
-
-
         $("#btnEdit").click(function () {
             JasonObject = {
                 BookId: $.urlParam("BookId"),
@@ -123,31 +118,50 @@
                     }
                 });//Close PUT Ajax
             }
-        });//Save changes 
+        });//Save changes
         $("#EditRow").click(function () {
-            if(ValidateForm(".modal-body")){
-            $("#myModal").modal("hide");
-            var Data =[
+            if (ValidateForm(".modal-body")) {
+                $("#myModal").modal("hide");
+                var Data = [
                     $("#FirstName").val(),
                     $("#SecondName").val(),
                     $("#FirstLastName").val(),
                     $("#SecondLastName").val(),
-                    "<span class='glyphicon glyphicon-remove-circle'> |</span>"+
+                    "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
                     "<span class='glyphicon glyphicon-ok-circle'></span>"
-            ];
-            console.log(Data)
-            $table
-            .row($("#hidden").val())
-            .data(Data)
-            .draw();
+                ];
+                console.log(Data)
+                $table
+                    .row($("#hidden").val())
+                    .data(Data)
+                    .draw();
             }
-        });//Edit Row 
+        });//Edit Row
         $("#CloseModal").click(function () {
-            $("#myModal").modal("hide");
+        $("#myModal").modal("hide");
         });//Close Modal
-    });//End of DocumentReady
+        $("#AddRow").click(function () {
+            
+            if (ValidateForm(".modal-body")) {
+                
+                var Data = [
+                    $("#FirstName").val(),
+                    $("#SecondName").val(),
+                    $("#FirstLastName").val(),
+                    $("#SecondLastName").val(),
+                    "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
+                    "<span class='glyphicon glyphicon-ok-circle'></span>"
+                ];
+                var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
 
-   
+                $("#MainTable").DataTable()
+                    .row
+                    .add(Data)
+                    .draw();
+                $("#myModal").modal("hide");
+            }
+        });//Closes Add Row function
+    });//End of DocumentReady
     function ValidateForm(Zone) {
         var Error = true;
         $(Zone + " .form-control").not("#hidden").each(function () {
@@ -161,13 +175,11 @@
         });
         return Error;
     }//Close Validation function
-    function GetAuthors()
-    {
+    function GetAuthors() {
         var Array = [];
         var Table = $table.data();
-        for(var i = 0; i < Table.length;i++)
-        {
-            var ArrayTable = {FirstName:Table[i][0], SecondName:Table[i][1], FirstLastName:Table[i][2], SecondLastName:Table[i][0]};
+        for (var i = 0; i < Table.length; i++) {
+            var ArrayTable = { FirstName: Table[i][0], SecondName: Table[i][1], FirstLastName: Table[i][2], SecondLastName: Table[i][0] };
             Array.push(ArrayTable);
         }
         return Array;
@@ -177,23 +189,30 @@
             $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
         }
     }//Close Warning Message function
-    function CloseModal()
-    {
+    function CloseModal() {
         $("#yModal").modal("hide");
     }//Close modal function
-
+    function OpenModal() {
+        $("#myModal").modal();
+        $("#EditRow").css("display", "none");
+        $("#AddRow").css("display", "inline");
+        $(".modal-content .form-control").not(".hidden").not(".hidden2").val("");
+    }//Opens up the modal cleaning the data
 
 </Script>
 <style>
-    #hidden
-    {
-        display:none;
+    #hidden {
+        display: none;
     }
+
     #hidden2 {
         display: none;
     }
-     .Error 
-     {
+
+    /*.Display {
+        display: none;
+    }*/
+    .Error {
         border: solid 1px red;
     }
 </style>
@@ -307,9 +326,9 @@
                 </div>
 
                 <div class="modal-footer">
-                   
+                    <button type="submit" class="btn btn-success btn-block" id="AddRow"><span class="glyphicon glyphicon-record"></span> Add the row</button>
                     <button type="submit" class="btn btn-success btn-block Display" id="EditRow"><span class="glyphicon glyphicon-record"></span> Edit the row</button>
-                    <button type="submit" class="btn btn-success btn-block" id="CloseModal" ><span class="glyphicon glyphicon-remove-circle"></span> Cancel </button>
+                    <button type="submit" class="btn btn-success btn-block" id="CloseModal"><span class="glyphicon glyphicon-remove-circle"></span> Cancel </button>
                 </div>
             </div>
 

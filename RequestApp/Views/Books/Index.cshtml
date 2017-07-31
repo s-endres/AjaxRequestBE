@@ -35,14 +35,12 @@
             ],
             "order": [[1, "asc"]]
         });//Initialize Data Table 
-
         $("tbody").on("click", ".glyphicon-ok-circle", function () {
             var Row = $(this).parents("tr");
             IdVal = $Table.row(Row).data()[1];
             window.location.replace("http://localhost:61232/Books/Edit?BookId="+IdVal);
 
         });//Redirect
-
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/GetMyJsonValues",
@@ -73,7 +71,6 @@
                 alert("Oscar se la come toda");
             }
         });//Close GET
-
         $(document).on("click", ".glyphicon-remove-circle", function () {
 
             var Row = $(this).parents("tr");
@@ -82,7 +79,7 @@
                 .index();
             $("#hidden").val(Index);
             $("#myModal").modal();
-        });
+        });//Obtains the index value of the row 
         $("#DeleteRow").click(function () {
             var Index = $("#hidden").val();
 
@@ -109,7 +106,6 @@
             });//Close Delete Ajax
 
         });//Close Delete Function
-
         $("#myDT tbody").on("click", ".glyphicon-download,.glyphicon-upload", function () {
             var RClass = "glyphicon-download";
             var AClass = "glyphicon-upload";
@@ -158,21 +154,15 @@
            
 
         });//Close Show More Function 
-       
-            
-
     });//Close Document.Ready
-
-
     function CloseModal() {
         $("#myModal").modal("hide");
-    }
-
+    }//Close the modal
     function WarningMessage() {
         if (!$('div[class="alert-danger"]').length) {
             $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
         }
-    }
+    }//Displays a warning message
     function Format(Data) {
         
         var Table = "<table><thead><tr><th>First Name</th><th>Second Name</th><th>First Last Name</th><th>Second Last Name</th></tr></thead><tbody>";
@@ -182,11 +172,11 @@
 
         });
         return Table+"</tbody>" + "</table>";
-    }
+    }//Adds a format to the sent data
     function ShowLogo(pSelector, pRClass, pAClass) {
         $(pSelector).removeClass(pRClass);
         $(pSelector).addClass(pAClass);
-    }
+    }//Swaps the icon of the show more row
 
 </script>
 <style>

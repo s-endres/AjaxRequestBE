@@ -27,18 +27,14 @@
 
             "columnDefs":
             [
-               
-                
+
+
             ],
             "order": [[1, "asc"]],
 
         });
-
-
-
-
         $("#btnSave").click(function () {
-            
+
             if (ValidateForm(".form-horizontal")) {
                 $.ajax({
                     type: "POST",
@@ -70,23 +66,78 @@
                 });
             }
         });//Closes POST Ajax method
-
         $("#AddRow").click(function () {
+            if (ValidateForm(".modal-body")) {
+                var Data = [
+                    $("#FirstName").val(),
+                    $("#SecondName").val(),
+                    $("#FirstLastName").val(),
+                    $("#SecondLastName").val(),
+                    "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
+                    "<span class='glyphicon glyphicon-ok-circle'></span>"
 
-            var Data = [
-                $("#FirstName").val(),
-                $("#SecondName").val(),
-                $("#FirstLastName").val(),
-                $("#SecondLastName").val(),
-            ];
-            var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
-          
-            $("#MainTable").DataTable()
-            .row
-            .add(Data)
-            .draw();
-            $("#myModal").modal("hide");
+                ];
+                var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
+
+                $("#MainTable").DataTable()
+                    .row
+                    .add(Data)
+                    .draw();
+                $("#myModal").modal("hide");
+            }
         });//Closes Add Row function
+        $("#EditRow").click(function () {
+            if (ValidateForm(".modal-body")) {
+                $("#myModal").modal("hide");
+                var Data = [
+                    $("#FirstName").val(),
+                    $("#SecondName").val(),
+                    $("#FirstLastName").val(),
+                    $("#SecondLastName").val(),
+                    "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
+                    "<span class='glyphicon glyphicon-ok-circle'></span>"
+                ];
+                console.log(Data)
+                $table
+                    .row($("#hidden").val())
+                    .data(Data)
+                    .draw();
+            }
+        });//Edit Row
+        $("tbody").on("click", ".glyphicon-ok-circle", function () {
+            $("#AddRow").css("display", "none");
+            $("#EditRow").css("display", "inline");
+
+            var Row = $(this).parents("tr");
+            var Index = $table.row(Row).index();
+            var Data = $table.row(Index).data();
+
+            $("#FirstName").val(Data[0]);
+            $("#SecondName").val(Data[1]);
+            $("#FirstLastName").val(Data[2]);
+            $("#SecondLastName").val(Data[3]);
+            $("#hidden").val(Index);
+            $("#myModal").modal();
+        });//Print the row data in the modal
+        $("tbody").on("click", ".glyphicon-remove-circle", function () {
+            var Row = $(this).parents("tr");
+            var Index = $table.row(Row).index();
+            var Data = $table.row(Index).data();
+            $("#hidden2").val(Index);
+            console.log("jaja saludos");
+            $("#myDeleteModal").modal();
+
+        });//Removes the data from the DataTable
+        $("#YesDelete").click(function () {
+            $("#myDeleteModal").modal("hide");
+            $table
+                .row($("#hidden2").val())
+                .remove()
+                .draw();
+        });//Comfirmation Modal Delete
+        $("#NoDelete").click(function () {
+            $("#myDeleteModal").modal("hide");
+        });//Confirmation Modal 
 
     });//Close Document Ready
 
@@ -96,10 +147,10 @@
         if (!$('div[class="alert-danger"]').length) {
             $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
         }
-    }
+    }//Displays a warning message
     function ValidateForm(Zone) {
         var Error = true;
-        $(Zone +" .form-control").not("#hidden").each(function () {
+        $(Zone + " .form-control").not("#hidden").each(function () {
             if ($(this).val().trim() == "" || $(this).val() < 0) {
                 $(this).addClass("Error");
                 Error = false;
@@ -109,29 +160,28 @@
             }
         });
         return Error;
-    }
+    }//Validates the form
     function CloseModal() {
         $("#myModal").modal("hide");
         $(".form-control").not(".Data").val("");
-    }
-    function OpenModal()
-    {
+    }//Closes the modal
+    function OpenModal() {
         $("#myModal").modal()
-    }
-
-    function AuthorsMethod()
-    {
-        var ArrayAuthors = [];                                                                                                                                                        
+        $("#EditRow").css("display", "none");
+        $("#AddRow").css("display", "inline");
+        $(".modal-content .form-control").not(".hidden").not(".hidden2").val("");
+    }//Opens up the modal an cleans the data of the input
+    function AuthorsMethod() {
+        var ArrayAuthors = [];
 
         var TableData = $table.data();
-        for (var i = 0; i < TableData.length;i++)
-        {
+        for (var i = 0; i < TableData.length; i++) {
             //console.log(TableData[i][0]);
             var ObjData = { FirstName: TableData[i][0], SecondName: TableData[i][1], FirstLastName: TableData[i][2], SecondLastName: TableData[i][3] };
             ArrayAuthors.push(ObjData);
         }
         return ArrayAuthors;
-    }
+    }//Obtains the Authors information
 </script>
 
 
@@ -140,7 +190,11 @@
     .Error {
         border: solid 1px red;
     }
+
     #hidden {
+        display: none;
+    }
+    #hidden2 {
         display: none;
     }
 </style>
@@ -148,10 +202,10 @@
 
 
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>Book</h4>
         <hr />
@@ -191,7 +245,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control"/>
+                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -205,7 +259,7 @@
 
 
 }
-   <!--------------------------MAIN TABLE-------------------------->
+<!--------------------------MAIN TABLE-------------------------->
 <div class="container">
 
     Add Row | <span><button id="AddRowModal" class="btn btn-success btn btn-default glyphicon glyphicon-plus-sign" type="button" onclick="OpenModal()"></button></span>
@@ -216,17 +270,15 @@
                 <th>Second Name</th>
                 <th>First Last Name</th>
                 <th>Second Last Name</th>
+                <th>Buttons</th>
             </tr>
         </thead>
-        <tbody>
-
-        </tbody>
+        <tbody></tbody>
     </table>
     <br>
     <button class="btn btn-success btn-block" id="ShowData">Show my data</button>
     </br>
     <!--------------------------MAIN TABLE-------------------------->
-
     <!------------------------------------MODAL------------------------------------->
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog">
@@ -255,13 +307,13 @@
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Last Name</label>
                             <input type="text" class="form-control" id="SecondLastName" placeholder="Enter Fourth Value">
                         </div>
-                             <input type="text" id="hidden">
+                        <input type="text" id="hidden">
                     </form>
                 </div>
 
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success btn-block" id="AddRow"><span class="glyphicon glyphicon-record"></span> Add the row</button>
-                    <!--<button type="submit" class="btn btn-success btn-block Display" id="EditRow"><span class="glyphicon glyphicon-record"></span> Edit the row</button>-->
+                    <button type="submit" class="btn btn-success btn-block Display" id="EditRow"><span class="glyphicon glyphicon-record"></span> Edit the row</button>
                     <button type="submit" class="btn btn-success btn-block" id="CloseModal" onclick="CloseModal()"><span class="glyphicon glyphicon-remove-circle"></span> Cancel </button>
                 </div>
             </div>
@@ -270,6 +322,31 @@
         </div>
     </div>
     <!------------------------------------MODAL------------------------------------->
+    <!------------------------------------DELETE MODAL------------------------------------->
+    <div class="modal fade" id="myDeleteModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-add"></span>Delete this row ????</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="alert alert-danger"><strong> Mah gosh </strong>Do you really want to delete this ??</div>
+                </div>
+                <input id="hidden2" type="text">
+                <div class="modal-footer">
+
+                    <button type="submit" class="btn btn-success btn-block Display" id="YesDelete"><span class="glyphicon glyphicon-record"></span>Yes, i want to delete this</button>
+                    <button type="submit" class="btn btn-success btn-block" id="NoDelete"><span class="glyphicon glyphicon-remove-circle"></span>No, it was a mistake</button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <!------------------------------------DELETE MODAL------------------------------------->
 
 </div>
 <div>
