@@ -18,7 +18,8 @@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/select2/js/select2.min.js"></script>
 <h2>Create</h2>
 
 <script>
@@ -32,6 +33,43 @@
             ],
             "order": [[1, "asc"]],
 
+        });
+       $Select1 = $("#Select1").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+        $Select2 = $("#Select2").select2({
+            placeholder: "Select Status",
+            allowClear: true
+        });
+        //send object to the data so you can acces it with the ajax
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: JSON.stringify({
+                Title: $("#Title").val(),
+                Description: $("#Description").val(),
+                ImageUrl: $("#ImageUrl").val(),
+                Publisher: $("#Publisher").val(),
+                PublicationYear: $("#PublicationYear").val(),
+                authors: AuthorsMethod()
+            }),
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Pdata) {
+                if (Pdata) {
+                    window.location.replace("http://localhost:61232/Books/");
+                }
+                else {
+
+                    if (!$('div[class="alert-danger"]').length) {
+                        $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Failed inserting the data</div>');
+                    }
+                }
+            },
+            error: function () {
+                WarningMessage();
+            }
         });
         $("#btnSave").click(function () {
 
@@ -255,8 +293,15 @@
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
-
         <div class="form-group">
+            <label class="control-label col-md-2">Genre</label>
+            <select class="form-control" id="Select1"></select>    
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Book Status</label>
+            <select class="form-control" id="Select2"></select>
+        </div>
+        <div>
             <div class="col-md-offset-2 col-md-10">
                 <input type="button" id="btnSave" value="Create" class="btn btn-default" />
             </div>

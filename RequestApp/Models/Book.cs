@@ -14,5 +14,7 @@ namespace RequestApp.Models
         public string Publisher { get; set; }
         public int PublicationYear { get; set; }
         public List<Author> Authors { get; set; }
+        public List<int> GenreIds { get; set; }
+        public int StatusId { get; set; }
     }
 }
