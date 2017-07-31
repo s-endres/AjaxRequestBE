@@ -41,6 +41,16 @@
             window.location.replace("http://localhost:61232/Books/Edit?BookId="+IdVal);
 
         });//Redirect
+        $("#YesDelete").click(function () {
+            $("#myDeleteModal").modal("hide");
+            $table
+                .row($("#hidden2").val())
+                .remove()
+                .draw();
+        })//Confirmation Modal Delete;
+        $("#NoDelete").click(function () {
+            $("#myDeleteModal").modal("hide");
+        });//Confirmation Modal
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/GetMyJsonValues",
@@ -72,16 +82,16 @@
             }
         });//Close GET
         $(document).on("click", ".glyphicon-remove-circle", function () {
-
             var Row = $(this).parents("tr");
             var Index = $Table
                 .row(Row)
                 .index();
             $("#hidden").val(Index);
             $("#myModal").modal();
-        });//Obtains the index value of the row 
-        $("#DeleteRow").click(function () {
             var Index = $("#hidden").val();
+
+            $("#hidden2").val(Index);
+            $("#myDeleteModal").modal();
 
             $.ajax({
                 type: "DELETE",
@@ -104,8 +114,8 @@
                     WarningMessage();
                 }
             });//Close Delete Ajax
-
-        });//Close Delete Function
+        });//Obtains the index value of the row 
+       
         $("#myDT tbody").on("click", ".glyphicon-download,.glyphicon-upload", function () {
             var RClass = "glyphicon-download";
             var AClass = "glyphicon-upload";
@@ -180,15 +190,22 @@
 
 </script>
 <style>
-    .Error {
-        border: solid 1px red;
-    }
-
     #hidden {
         display: none;
     }
-</style>
 
+    #hidden2 {
+        display: none;
+    }
+
+    /*.Display {
+        display: none;
+    }*/
+    .Error {
+        border: solid 1px red;
+    }
+</style>
+</style>
 <h2>Index</h2>
 
 <p>
@@ -225,5 +242,27 @@
     </thead>
     <tbody></tbody>
 </table>
+<div class="modal fade" id="myDeleteModal" role="dialog">
+    <div class="modal-dialog">
 
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header" style="padding:35px 50px;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4><span class="glyphicon glyphicon-add"></span>Delete this row ????</h4>
+            </div>
+            <div class="modal-body" style="padding:40px 50px;">
+                <div class="alert alert-danger"><strong> Mah gosh </strong>Do you really want to delete this ??</div>
+            </div>
+            <input id="hidden2" type="text">
+            <div class="modal-footer">
+
+                <button type="submit" class="btn btn-success btn-block Display" id="YesDelete"><span class="glyphicon glyphicon-record"></span>Yes, i want to delete this</button>
+                <button type="submit" class="btn btn-success btn-block" id="NoDelete"><span class="glyphicon glyphicon-remove-circle"></span>No, it was a mistake</button>
+            </div>
+        </div>
+
+
+    </div>
+</div>
 
