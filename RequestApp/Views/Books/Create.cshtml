@@ -13,6 +13,8 @@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/select2/js/select2.min.js"></script>
 
 <h2>Create</h2>
 
@@ -32,6 +34,16 @@
 
         });
 
+        $("#select2").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+
+        $("#select1").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+
         $('tbody').on('click', '.glyphicon-trash', function () {
             $("#myDeleteModal").modal();
             var RowHTML = $(this).parents('tr');
@@ -41,7 +53,7 @@
         $('#deleteBtn').click(function () {
             var rowIndex = $("#hiddenInput").val();
             $vDTable.row(rowIndex).remove().draw();
-            
+
         });
 
         $(document).on('click', '.glyphicon-folder-open', function () {
@@ -63,7 +75,7 @@
         })
 
         $("#btnSave").click(function () {
-
+            console.log(validateMyForm());
             if (validateMyForm() && validateMyDTable()) {
 
                 var authors = [];
@@ -77,9 +89,7 @@
                     }
 
                     authors.push(authorObj);
-
                 });
-
 
                 $.ajax({
                     type: "POST",
@@ -87,7 +97,7 @@
                     data: JSON.stringify({
                         Title: $("#Title").val(),
                         Description: $("#Description").val(),
-                        ImageURL: $("#ImageURL").val(),
+                        ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
                         Authors: authors
@@ -95,6 +105,7 @@
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
                     success: function (Data) {
+                        console.log(Data);
                         if (Data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
@@ -105,6 +116,39 @@
                         pError();
                     }
                 });
+            }
+        });
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                $.each(Data, function () {
+                    $("#select2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
+                });
+            },
+            error: function () {
+                pError();
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                $.each(Data, function () {
+                    $("#select1").append("<option value='" + this.StatusId + "'>" + this.Name + "</option>");
+                });
+            },
+            error: function () {
+                pError();
             }
         });
 
@@ -141,13 +185,14 @@
             $("#btnAdd").css("display", "none");
         }
         $('#myModal').modal('show');
-        
+
     }
 
     function SwapClass(ThisText, ClassR, ClassA) {
         $(ThisText).removeClass(ClassR);
         $(ThisText).addClass(ClassA);
     }
+
     function validateMyForm() {
         var flag = true;
         $(".form-horizontal div input[type='text']").each(function () {
@@ -168,7 +213,32 @@
                 SwapClass($(this).parent(), "has-error", "has-success");
             }
 
+           
         });
+
+        if ($("#select2").val() == null) {
+            if (!$('.alert-danger').length) {
+                flag = false;
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
+            }
+        } else { 
+            $('.alert-danger').remove();
+        }
+        return flag;
+    }
+
+    function validateMyDTable() {
+        var flag = true;
+        console.log($vDTable);
+        if ($vDTable.data().length == 0) {
+        //if ($vDTable == null) {
+            flag = false;
+            if (!$('.alert-danger').length) {
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
+            }
+        } else {
+            $('.alert-danger').remove();
+        }
         return flag;
     }
 
@@ -186,19 +256,7 @@
         return flag;
     }
 
-    function validateMyDTable() {
-        var flag = true;
-
-        if ($vDTable != null) {
-            if (!$('.alert-danger').length) {
-                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>At least one author is required</div>");
-            }
-            flag = false;
-        } else {
-            $('.alert-danger').remove();
-        }
-        return flag;
-    }
+   
 
     function add() {
         if (validateMyModalForm()) {
@@ -210,7 +268,7 @@
                 "<span class='glyphicon glyphicon-edit'> | </span>" +
                 "<span class='glyphicon glyphicon-trash'></span>"
             ]).draw();
-            
+
             $("#btnClose").click();
             if ($('.alert-danger').length) {
                 $('.alert-danger').remove();
@@ -266,6 +324,20 @@
             <div class="col-md-10">
                 <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Genre</label>
+            <div class="col-md-10">
+                <select id="select2" class="form-control" multiple></select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Status</label>
+            <div class="col-md-10">
+                <select id="select1" class="form-control"></select>
             </div>
         </div>
 

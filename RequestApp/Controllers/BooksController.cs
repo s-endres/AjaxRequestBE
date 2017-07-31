@@ -23,6 +23,8 @@ namespace RequestApp.Controllers
                 ImageUrl = "MyImage.jpg",
                 Publisher = "This is my publisher",
                 PublicationYear = 2052,
+                StatusId = 1,
+                GenreIds = new List<int>(){2,3},
                 Authors = new List<Author>()
                 {
                     new Author()
@@ -49,6 +51,8 @@ namespace RequestApp.Controllers
                 ImageUrl = "MyImage2.jpg",
                 Publisher = "Alfredo Valverde",
                 PublicationYear = 1024,
+                StatusId = 2,
+                GenreIds = new List<int>(){1,4,5},
                 Authors = new List<Author>()
                 {
                     new Author()
@@ -75,6 +79,8 @@ namespace RequestApp.Controllers
                 ImageUrl = "MyImage.jpg",
                 Publisher = "Oscar Valverde",
                 PublicationYear = 592,
+                StatusId = 2,
+                GenreIds = new List<int>(){3,2,1},
                 Authors = new List<Author>()
                 {
                     new Author()
@@ -100,6 +106,47 @@ namespace RequestApp.Controllers
                     }
                 }
             },
+        };
+        public static List<Genre> Genres = new List<Genre>()
+        {
+            new Genre
+            {
+                GenreId= 1,
+                Name="Fiction"
+            },
+            new Genre
+            {
+                GenreId= 2,
+                Name="Fantasy"
+            },
+            new Genre
+            {
+                GenreId= 3,
+                Name="Horror"
+            },
+            new Genre
+            {
+                GenreId= 4,
+                Name="Drama"
+            },
+            new Genre
+            {
+                GenreId= 5,
+                Name="Mistery"
+            }
+        };
+        public static List<Status> Statuses = new List<Status>()
+        {
+            new Status
+            {
+                StatusId = 1,
+                Name = "Published"
+            },
+            new Status
+            {
+                StatusId = 2,
+                Name = "UnPublished"
+            }
         };
 
         // GET: Books
@@ -128,7 +175,7 @@ namespace RequestApp.Controllers
         }
 
         [HttpPost]
-        public JsonResult AddNewBook([Bind(Include = "Title,Description,ImageUrl,Publisher,PublicationYear")] Book book, List<Author> authors)
+        public JsonResult AddNewBook([Bind(Include = "Title,Description,ImageUrl,Publisher,PublicationYear,GenreIds,StatusId")] Book book, List<Author> authors)
         {
             try
             {
@@ -176,8 +223,30 @@ namespace RequestApp.Controllers
             return Json(false, JsonRequestBehavior.AllowGet);
         }
 
+        
+        [HttpGet]
+        public JsonResult getStatutes()
+        {
+            try
+            {
+                return Json(Statuses, JsonRequestBehavior.AllowGet);
+            }catch { }
+            return Json(false, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult getGenres()
+        {
+            try
+            {
+                return Json(Genres, JsonRequestBehavior.AllowGet);
+            }
+            catch { }
+            return Json(false, JsonRequestBehavior.AllowGet);
+        }
+
         [HttpPut]
-        public JsonResult UpdateBook([Bind(Include = "BookId,Title,Description,ImageUrl,Publisher,PublicationYear")] Book book, List<Author> authors)
+        public JsonResult UpdateBook([Bind(Include = "BookId,Title,Description,ImageUrl,Publisher,PublicationYear,GenreIds,StatusId")] Book book, List<Author> authors)
         {
             if (book.BookId != null)
             {
@@ -188,11 +257,18 @@ namespace RequestApp.Controllers
                 foundBook.Publisher = book.Publisher;
                 foundBook.PublicationYear = book.PublicationYear;
                 foundBook.Authors = authors;
+                foundBook.GenreIds = book.GenreIds;
+                foundBook.StatusId = book.StatusId;
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
             return Json(false, JsonRequestBehavior.AllowGet);
         }
 
+
+        private static Status getStatutesById(int? statusId)
+        {
+            return Statuses.Where(s => s.StatusId == statusId).FirstOrDefault();
+        }
 
 
     }
