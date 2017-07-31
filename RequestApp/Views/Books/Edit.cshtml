@@ -27,6 +27,18 @@
             }]
         });
 
+
+        $("#selectStatus").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+
+        $("#selectGenre").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+
+
         $("#myModal").on('hidden.bs.modal', function () {
             cleanModalForm(); //close modal
         });
@@ -55,10 +67,12 @@
                     $("#ImageUrl").val(data.ImageUrl);
                     $("#Publisher").val(data.Publisher);
                     $("#PublicationYear").val(data.PublicationYear);
+                    console.log(data);
                     $.each(data.Authors, function (index, item) {
                         var array = [item.FirstName, item.SecondName, item.FirstLastName, item.SecondLastName, "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
                         $table.row.add(array).draw();
                         console.log(item);
+                        //$("div.id_100 select").val("val2").trigger("change");
                     });
 
             },
@@ -84,6 +98,46 @@
             }
             $("#closeDeleteModal").click();
         })
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $.each(data, function (index, item) {
+                    $("#selectStatus").append("<option value=" + item.StatusId + ">" + item.Name + "</option>");
+                });
+            },
+
+            error: function () {
+                ValidateMyAlert("Class='alert alert-warning'", 'stephan te falle :c', 'Warning')
+            }
+
+        });
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                console.log(data);
+                $.each(data, function (index, item) {
+                    $("#selectGenre").append("<option value=" + item.GenreId + ">" + item.Name + "</option>");
+                });
+            },
+
+            error: function () {
+                ValidateMyAlert("Class='alert alert-warning'", 'stephan te falle :c', 'Warning')
+            }
+
+        });
+
 
     });
 
@@ -233,6 +287,17 @@
 
         });
 
+        $("select[class='form-control'").each(function () {
+
+            if ($(this).val() == null) {
+                console.log("soy null");
+                changeClass($(this).parent(), "has-success", "has-error");
+                cellEmpty = false;
+            }
+            else { changeClass($(this).parent("div"), "has-error", "has-success"); }
+
+        });
+
         return cellEmpty;
     }
 
@@ -297,7 +362,19 @@
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Status</label>
+            <div class="col-md-10">
+                <select id="selectStatus" class="form-control"> </select>
+            </div>
+        </div>
 
+        <div class="form-group">
+            <label class="control-label col-md-2">Genres</label>
+            <div class="col-md-10">
+                <select id="selectGenre" class="form-control" multiple> </select>
+            </div>
+        </div>
         <!-- Table -->
         <div class="panel-heading">
             DataTable Advanced Table |

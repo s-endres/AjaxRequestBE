@@ -8,7 +8,9 @@
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
-
+<!-- Select JavaScript -->
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/select2/js/select2.min.js"></script>
 
 <style>
     .Error {
@@ -28,6 +30,17 @@
                 "targets": [4],
                 "orderable": false
             }]
+        });
+
+        
+        $("#selectStatus").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+
+        $("#selectGenre").select2({
+            placeholder: "Select a genre",
+            allowClear: true
         });
 
         $("#btnSave").click(function () {
@@ -50,6 +63,47 @@
             }
             $("#closeDeleteModal").click();
         })
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $.each(data, function (index, item) {
+                    $("#selectStatus").append("<option value=" + item.StatusId + ">" + item.Name + "</option>");
+                });
+            },
+
+            error: function () {
+                ValidateMyAlert("Class='alert alert-warning'", 'stephan te falle :c', 'Warning')
+            }
+
+        });
+
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                console.log(data);
+                $.each(data, function (index, item) {
+                    $("#selectGenre").append("<option value=" + item.GenreId + ">" + item.Name + "</option>");
+                });
+            },
+
+            error: function () {
+                ValidateMyAlert("Class='alert alert-warning'", 'stephan te falle :c', 'Warning')
+            }
+
+        });
+
+
     });
 
     function AddAuthors() {
@@ -198,6 +252,17 @@
 
         });
 
+        $("select[class='form-control'").each(function () {
+
+            if ($(this).val() == null) {
+                console.log("soy null");
+                changeClass($(this).parent(), "has-success", "has-error");
+                cellEmpty = false;
+            }
+            else { changeClass($(this).parent(), "has-error", "has-success"); }
+
+        });
+
         return cellEmpty;
     }
 
@@ -260,39 +325,52 @@
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Status</label>
+            <div class="col-md-10">
+                <select id="selectStatus" class="form-control"> </select>      
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">Genres</label>
+            <div class="col-md-10">
+                <select id="selectGenre" class="form-control" multiple > </select>
+            </div>
+        </div>
         <div class="panel-heading">
             DataTable Advanced Table |
             <button type="button" data-toggle="modal" data-target="#myModal">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </button>
-        </div>
-        <div class="row">
+            </div>
+                <div class="row">
 
-            <div class="col-md-12">
+                    <div class="col-md-12">
 
-                <!-- Table -->
+                        <!-- Table -->
 
-                <table id="datatable" class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            <th>First Name</th>
-                            <th>Second Name</th>
-                            <th>First Last Name</th>
-                            <th>Second Last Name</th>
-                            <th>Buttons</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabla2"> </tbody>
-                </table>
+                        <table id="datatable" class="table table-striped table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>First Name</th>
+                                    <th>Second Name</th>
+                                    <th>First Last Name</th>
+                                    <th>Second Last Name</th>
+                                    <th>Buttons</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla2"> </tbody>
+                        </table>
 
+                    </div>
+                </div>
+            <div class="form-group">
+                <div>
+                    <input type="button" id="btnSave" value="Create" class="btn btn-default" disabled />
+                </div>
             </div>
         </div>
-        <div class="form-group">
-            <div >
-                <input type="button" id="btnSave" value="Create" class="btn btn-default"  disabled />
-            </div>
-        </div>
-    </div>
 
     	<!-- Modal -->
     <div id="myModal" class="modal fade" role="dialog">
