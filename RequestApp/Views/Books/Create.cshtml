@@ -35,7 +35,8 @@
         });
         $("#btnSave").click(function () {
 
-            if (ValidateForm(".form-horizontal")) {
+            if (ValidateForm(".form-horizontal") || CheckDatable()) {
+            
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
@@ -182,6 +183,13 @@
         }
         return ArrayAuthors;
     }//Obtains the Authors information
+    function CheckDatable()
+    {
+        if ($table.data().length === 0)
+        {
+            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without an author >:v</div>');
+        }
+    }
 </script>
 
 
@@ -256,8 +264,6 @@
             </div>
         </div>
     </div>
-
-
 }
 <!--------------------------MAIN TABLE-------------------------->
 <div class="container">
