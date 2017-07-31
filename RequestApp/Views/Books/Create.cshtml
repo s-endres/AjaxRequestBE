@@ -4,11 +4,23 @@
     ViewBag.Title = "Create";
 }
 
+<!-- MetisMenu CSS -->
+<link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
+<!-- DataTables CSS -->
+<link href="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css" rel="stylesheet">
+<!-- DataTables Responsive CSS -->
+<link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
+<!-- DataTables JavaScript -->
+<script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
+<script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
+
 <h2>Create</h2>
 
 <script>
    
     $(document).ready(function () {
+        $AuthorTable = $("#AuthorTable").DataTable({responsive: true});
+       
         $("#btnSave").click(function () {
            
             $.ajax({
@@ -39,7 +51,16 @@
             });
 
         });
+        
     });
+    function AddAuthorInfo() {
+        var RowData = [$("#Firstname").val(),
+        $("#Middlename").val(),
+        $("#Lastname").val(),
+        $("#Surname").val()];
+        $AuthorTable.row.add(RowData).draw();
+
+    }
     function ErrorAlert() {
         if ($("#ErrorAlert").length == 0) {
             var htmlModal1 = '<div id=ErrorAlert class="alert alert-danger">' +
@@ -104,6 +125,54 @@
             <div class="col-md-offset-2 col-md-10">
                 <input type="button" id="btnSave" value="Create" class="btn btn-default" />
             </div>
+        </div>
+    </div>
+    <div id="table">
+        <p class="lead">
+           <b> Author List: </b> 
+        </p>
+        <button id="AddForm" class="btn btn-default" data-toggle="modal" data-target="#AuthorInfoModal">
+            Add Author
+        </button>
+        <br>
+        <br>
+        <table id="AuthorTable" class="display table table table-condensed">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Middle Name</th>
+                    <th>Lastname</th>
+                    <th>Surname</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <div id="AuthorInfoModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Author Information</h4>
+                </div>
+                <div class="modal-body">
+                   <form id="AuthorInfo">
+                       <label>First Name</label><br>
+                       <input type="text" id="Firstname" value=""><br>
+                       <label>Middle Name</label><br>
+                       <input type="text" id="Middlename" value=""><br>
+                       <label>Last Name</label><br>
+                       <input type="text" id="Lastname" value=""><br>
+                       <label>Surname</label><br>
+                       <input type="text" id="Surname" value=""><br>
+                   </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="addMyModal" class="btn btn-default" onclick="AddAuthorInfo()">Add</button>
+                </div>
+            </div>
+
         </div>
     </div>
 }
