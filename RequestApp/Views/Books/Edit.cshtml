@@ -46,7 +46,7 @@
             $("#SecondName").val(Data[1]);
             $("#FirstLastName").val(Data[2]);
             $("#SecondLastName").val(Data[3]);
-            $("hidden").val(Index);
+            $("#hidden").val(Index);
             $("#myModal").modal();
         });
         
@@ -66,9 +66,8 @@
                     [
                        Authors[i].FirstName, Authors[i].SecondName, Authors[i].FirstLastName, Authors[i].SecondLastName, "<span class='glyphicon glyphicon-remove-circle'> |</span><span class='glyphicon glyphicon-ok-circle'></span>"
                     ]
-                    DataArray.push(ArrayAuthors);
-                }
-                $table.rows.add(DataArray).draw()
+                    $table.row.add(ArrayAuthors).draw()
+                }             
                 $("#Description").val(Data.Description),
                 $("#ImageUrl").val(Data.ImageUrl),
                 $("#PublicationYear").val(Data.PublicationYear),
@@ -93,7 +92,7 @@
                 Title: $("#Title").val(),
                 Authors: GetAuthors()
             };
-            if (Validate) {
+            if (ValidateForm(".form-horizontal")) {
                 $.ajax({
                     type: "PUT",
                     url: "http://localhost:61232/Books/UpdateBook ",
@@ -111,6 +110,8 @@
         });
 
         $("#EditRow").click(function () {
+            if(ValidateForm(".modal-body")){
+            $("#myModal").modal("hide");
             var Data =[
                     $("#FirstName").val(),
                     $("#SecondName").val(),
@@ -124,10 +125,27 @@
             .row($("#hidden").val())
             .data(Data)
             .draw();
+            }
         });
-
+        $("#CloseModal").click(function () {
+            $("#myModal").modal("hide");
+        });
     });//End of DocumentReady
 
+
+    function ValidateForm(Zone) {
+        var Error = true;
+        $(Zone + " .form-control").not("#hidden").each(function () {
+            if ($(this).val().trim() == "" || $(this).val() < 0) {
+                $(this).addClass("Error");
+                Error = false;
+            }
+            else {
+                $(this).removeClass("Error");
+            }
+        });
+        return Error;
+    }
     function GetAuthors()
     {
         var Array = [];
@@ -144,19 +162,6 @@
             $("#myDT").prepend('<div class="alert alert-danger">< strong > Omaiga!</strong >Something went wrong >:O</div >');
         }
     }
-    function Validate() {
-        var Error = true;
-        $('.form-horizontal input[class="form-control"]').each(function () {
-            if ($(this).val().trim() == "") {
-                $(this).addClass("Error");
-                Error = false;
-            }
-            else {
-                $(this).removeClass("Error");
-            }
-        });
-        return Error;
-    }
     function CloseModal()
     {
         $("#yModal").modal("hide");
@@ -168,6 +173,10 @@
     #hidden
     {
         display:none;
+    }
+     .Error 
+     {
+        border: solid 1px red;
     }
 </style>
 
@@ -282,7 +291,7 @@
                 <div class="modal-footer">
                    
                     <button type="submit" class="btn btn-success btn-block Display" id="EditRow"><span class="glyphicon glyphicon-record"></span> Edit the row</button>
-                    <button type="submit" class="btn btn-success btn-block" id="CloseModal" onclick="CloseModal()"><span class="glyphicon glyphicon-remove-circle"></span> Cancel </button>
+                    <button type="submit" class="btn btn-success btn-block" id="CloseModal" ><span class="glyphicon glyphicon-remove-circle"></span> Cancel </button>
                 </div>
             </div>
 
