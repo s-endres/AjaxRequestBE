@@ -22,7 +22,9 @@
         $AuthorTable = $("#AuthorTable").DataTable({responsive: true});
        
         $("#btnSave").click(function () {
-           
+
+            var AuthorList = [];
+
             $.ajax({
                 type: "POST",
                 url: "http://localhost:61232/Books/AddNewBok",
@@ -31,7 +33,8 @@
                     Description: $("#Description").val(),
                     ImageUrl: $("#ImageUrl").val(),
                     Publisher: $("#Publisher").val(),
-                    PublicationYear: $("#PublicationYear").val()
+                    PublicationYear: $("#PublicationYear").val(),
+                    Author: 
                 }),
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
@@ -54,13 +57,25 @@
         
     });
     function AddAuthorInfo() {
+
         var RowData = [$("#Firstname").val(),
-        $("#Middlename").val(),
-        $("#Lastname").val(),
-        $("#Surname").val()];
+                       $("#Middlename").val(),
+                       $("#Lastname").val(),
+                       $("#Surname").val()];
+
+        
         $AuthorTable.row.add(RowData).draw();
 
     }
+
+    function TextListValidation(TextList)
+    {
+        var validator = true;
+        for (var i = 0; TextList < length; i++) {
+
+        }
+    }
+
     function ErrorAlert() {
         if ($("#ErrorAlert").length == 0) {
             var htmlModal1 = '<div id=ErrorAlert class="alert alert-danger">' +
