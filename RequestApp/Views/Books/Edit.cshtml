@@ -16,7 +16,8 @@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/select2/js/select2.min.js"></script>
 
 <h2>Edit</h2>
 <style>
@@ -42,6 +43,18 @@
                     "orderable": false
                 }
             ]
+        });
+
+        $.get("http://localhost:61232/Books/getStatutes", function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#Select1").append('<option value="' + data[i].StatusId + '">' + data[i].Name + '</option>');
+            }
+        });
+
+        $.get("http://localhost:61232/Books/getGenres", function (data) {
+            for (var i = 0; i < data.length; i++) {
+                $("#Select2").append('<option value="' + data[i].GenreId + '">' + data[i].Name + '</option>');
+            }
         });
 
         $('#btnAdd').click(function () {
@@ -75,11 +88,17 @@
                 if (data === false) {
                     window.location.replace("http://localhost:61232/Books/");
                 } else {
+                    console.log(data);
                     $("#Title").val(data.Title);
                     $("#Description").val(data.Description);
                     $("#ImageUrl").val(data.ImageUrl);
                     $("#Publisher").val(data.Publisher);
                     $("#PublicationYear").val(data.PublicationYear);
+                    $("#Select1").val(data.StatusId).trigger('change');
+                    $("#Select2").val(data.GenreIds).trigger('change');
+                    //$(data.GenreIds).each(function (i, e) {
+                    //    $('#Select2 option[value = "' + e + '"]').prop("selected", true);
+                    //});
                     var Data = [];
                     for (var i = 0; i < data.Authors.length; i++) {
                         var Arreglo = [
@@ -100,8 +119,17 @@
             }
         });
 
+        $("#Select1").select2({
+            placeholder: "Select a statuts",
+            allowClear: true
+        });
+
+        $("#Select2").select2({
+            placeholder: "Select a genre"
+        });
+
         $("#btnEdit").click(function () {
-            if (Validate(".form-horizontal") && ValidateTable()) {
+            if (Validate(".form-horizontal") && ValidateTable() && validateSelect()) {
                 $.ajax({
                     type: "PUT",
                     url: "http://localhost:61232/Books/UpdateBook",
@@ -114,7 +142,9 @@
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
-                        Authors: GetAuthors()
+                        Authors: GetAuthors(),
+                        GenreIds: $("#Select2").val(),
+                        StatusId: $("#Select1").val()
                     }),
                     success: function (data) {
                         if (data) {
@@ -165,7 +195,7 @@
 
     function Validate(Zone) {
         var validation = true;
-        $(Zone + " .form-control").not("#hidden").not("#deleteHidden").each(function () {
+        $(Zone + " .form-control").not("#hidden").not("#deleteHidden").not("#Select1").not("#Select2").each(function () {
             if ($(this).val().trim() == '' || $(this).val() < 0) {
                 $(this).addClass("Error");
                 validation = false;
@@ -226,6 +256,15 @@
         }
         return true;
     }
+
+    function validateSelect() {
+        validate = true;
+        if ($("#Select2").val() == null) {
+            validate = false;
+            AddRemove("Select", "Select something in genre");
+        }
+        return validate;
+    }
 </Script>
 
 @using (Html.BeginForm())
@@ -275,6 +314,18 @@
             <div class="col-md-10">
                 @Html.EditorFor(model => model.PublicationYear, new { htmlAttributes = new { @class = "form-control" } })
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Status</label>
+            <div class="col-md-10">
+                <select id="Select1" class="form-control"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Genre</label>
+            <div class="col-md-10">
+                <select id="Select2" class="form-control" multiple></select>
             </div>
         </div>
     </div>
