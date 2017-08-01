@@ -19,11 +19,31 @@
 <script>
    
     $(document).ready(function () {
-        $AuthorTable = $("#AuthorTable").DataTable({responsive: true});
+        $AuthorTable = $("#AuthorTable").DataTable({
+            responsive: true,
+            "columnDefs":
+		    [
+                {
+			        "targets": [4],
+			        "sortable": false
+			    }
+		    ]
+        });
        
         $("#btnSave").click(function () {
 
             var AuthorList = [];
+            /*
+                FirstName 
+                SecondName 
+                FirstLastName 
+                SecondLastName
+            */
+            var RowCount = $AuthorTable.data().length;
+            console.log(RowCount);
+            for (var i = 0; i < RowCount; i++) {
+
+            }
 
             $.ajax({
                 type: "POST",
@@ -62,9 +82,16 @@
                        $("#Middlename").val(),
                        $("#Lastname").val(),
                        $("#Surname").val()];
-        if (TextListValidation(RowData) == true) {
+        if (TextListValidation(RowData) == true)
+        {
+            RowData.push('<div align="center"><button type="button" class="glyphicon glyphicon-pencil" onclick="OpenEdit(this)"></button>' +
+                         '<button type="button" class="glyphicon glyphicon-remove-sign" onclick="RemoveFromTable(this)"></button></div>');
+
             $AuthorTable.row.add(RowData).draw();
             $("#AuthorInfoModal").modal("hide");
+            if ($("#ErrorAlert").length) { $("#ErrorAlert").remove(); }
+            $(".AuthorInfoInput").val("");
+
         } else {
 
           var ModalAlert = '<div id=ErrorAlert class="alert alert-danger">' +
@@ -72,25 +99,27 @@
                            '</div>';
           $("#AuthorInfoModal").append(ModalAlert);
         }
-        
-
     }
 
     function TextListValidation(TextList)
     {
         var validator = true;
-        for (var i = 0; TextList < length; i++) 
+        for (var i = 0; i < TextList.length; i++) 
         {
-            if(TextList[i].val().trim()=="")
-            {
-                validator = false;
-                
-            }
-                
+            if(TextList[i].trim()==""){validator = false;}
         }
         return validator;
     }
+
+    function OpenEdit()
+    {
+        console.log("Edit");
+    }
     
+    function RemoveFromTable(button) {
+        var rowToRemove = $(button).parents("tr");
+        $AuthorTable.row(rowToRemove).remove().draw();
+    }
 
     function ErrorAlert() {
         if ($("#ErrorAlert").length == 0) {
@@ -100,8 +129,6 @@
             $("body").append(htmlModal1);
         }
     }
-
-
 </script>
 
 @using (Html.BeginForm()) 
@@ -174,6 +201,7 @@
                     <th>Middle Name</th>
                     <th>Lastname</th>
                     <th>Surname</th>
+                    <th>Options</th>
                 </tr>
             </thead>
         </table>
@@ -189,13 +217,13 @@
                 <div class="modal-body">
                    <form id="AuthorInfo">
                        <label>First Name</label><br>
-                       <input type="text" id="Firstname" value=""><br>
+                       <input type="text" id="Firstname" value="" class="AuthorInfoInput"><br>
                        <label>Middle Name</label><br>
-                       <input type="text" id="Middlename" value=""><br>
+                       <input type="text" id="Middlename" value="" class="AuthorInfoInput"><br>
                        <label>Last Name</label><br>
-                       <input type="text" id="Lastname" value=""><br>
+                       <input type="text" id="Lastname" value="" class="AuthorInfoInput"><br>
                        <label>Surname</label><br>
-                       <input type="text" id="Surname" value=""><br>
+                       <input type="text" id="Surname" value="" class="AuthorInfoInput"><br>
                    </form>
                 </div>
                 <div class="modal-footer">
