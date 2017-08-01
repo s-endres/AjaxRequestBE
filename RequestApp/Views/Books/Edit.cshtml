@@ -181,7 +181,10 @@
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
+                        GenreIds: $("#slct2").val(),
+                        StatusId: $("#slct1").val(),
                         Authors: AuthorsArray
+
                     }),
                     success: function (data) {
                         if (data) {
