@@ -34,7 +34,7 @@
                     ImageUrl: $("#ImageUrl").val(),
                     Publisher: $("#Publisher").val(),
                     PublicationYear: $("#PublicationYear").val(),
-                    Author: 
+                    Author: AuthorList
                 }),
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8',
@@ -62,19 +62,35 @@
                        $("#Middlename").val(),
                        $("#Lastname").val(),
                        $("#Surname").val()];
+        if (TextListValidation(RowData) == true) {
+            $AuthorTable.row.add(RowData).draw();
+            $("#AuthorInfoModal").modal("hide");
+        } else {
 
+          var ModalAlert = '<div id=ErrorAlert class="alert alert-danger">' +
+                           '<strong>Invalid Author!</strong> Please make sure there are <bold>no blank spaces</bold> in any of the input fields.' +
+                           '</div>';
+          $("#AuthorInfoModal").append(ModalAlert);
+        }
         
-        $AuthorTable.row.add(RowData).draw();
 
     }
 
     function TextListValidation(TextList)
     {
         var validator = true;
-        for (var i = 0; TextList < length; i++) {
-
+        for (var i = 0; TextList < length; i++) 
+        {
+            if(TextList[i].val().trim()=="")
+            {
+                validator = false;
+                
+            }
+                
         }
+        return validator;
     }
+    
 
     function ErrorAlert() {
         if ($("#ErrorAlert").length == 0) {
@@ -184,7 +200,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" id="addMyModal" class="btn btn-default" onclick="AddAuthorInfo()">Add</button>
+                    <button type="button" class="btn btn-default" onclick="AddAuthorInfo()">Add</button>
                 </div>
             </div>
 
