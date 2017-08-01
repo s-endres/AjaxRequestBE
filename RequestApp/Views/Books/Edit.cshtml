@@ -40,6 +40,39 @@
         $summernote = $(".summernote").summernote({
             height: 100
         });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                $.each(Data, function () {
+                    $("#slct2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
+                });
+            },
+            error: function () {
+                pError();
+            }
+        });
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Data) {
+                $.each(Data, function () {
+                    $("#slct1").append("<option value='" + this.StatusId + "'>" + this.Name + "</option>");
+                });
+            },
+            error: function () {
+                pError();
+            }
+        });
+
         
         $.ajax({
             type: "GET",
@@ -57,10 +90,8 @@
                     $("#ImageUrl").val(Data.ImageUrl);
                     $("#Publisher").val(Data.Publisher);
                     $("#PublicationYear").val(Data.PublicationYear);
-                    $("#slct2").val(Data.GenreIds).trigger('change');
-                    console.log($("#slct2").val());
-                    $("#slct1").val(Data.StatusId).trigger('change');
-                    console.log($("#slct1").val());
+                    $("#slct2").val(Data.GenreIds).trigger('change'); 
+                    $("#slct1").val(Data.StatusId).trigger('change'); 
 
                     var AuthorsData = [];
                     for (var i = 0; i < Data.Authors.length; i++) {
@@ -90,42 +121,8 @@
         });
 
         $("#slct1").select2({
-            placeholder: "Select Status",
-            allowClear: true
-        });
-
-
-        $.ajax({
-            type: "GET",
-            url: "http://localhost:61232/Books/getGenres",
-            data: "",
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (Data) {
-                $.each(Data, function () {
-                    $("#slct2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
-                });
-            },
-            error: function () {
-                pError();
-            }
-        });
-
-        $.ajax({
-            type: "GET",
-            url: "http://localhost:61232/Books/getStatutes",
-            data: "",
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (Data) {
-                $.each(Data, function () {
-                    $("#slct1").append("<option value='" + this.SuccessId + "'>" + this.Name + "</option>");
-                });
-            },
-            error: function () {
-                pError();
-            }
-        });
+            placeholder: "Select Status"
+        }); 
 
         $(document).on('click', '.glyphicon-folder-open', function () {
             $('.modal-body input[type="text"]').val("").parent().removeClass("has-success");
@@ -159,7 +156,7 @@
         })
 
         $("#btnEdit").click(function () {
-            if (validateMyDTable()) {
+            if (validateMyForm() && validateMyDTable()) {
                 var AuthorsArray = [];
 
                 for (var i = 0; i < $eDTable.data().length; i++) {
@@ -214,15 +211,15 @@
         if ($eDTable != null) {
             if ($eDTable.data().length <= 0) {
                 if (!$('.alert-danger').length) {
-                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>At least one author is required</div>");
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
+                } else {
+                    $('.alert-danger').remove();
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
                 }
                 flag = false;
-            } else {
-                $('.alert-danger').remove();
             }
             return flag;
-
-        }
+        } 
     }
 
     function validateMyModalForm() {
@@ -241,7 +238,8 @@
 
     function validateMyForm() {
         var flag = true;
-        $('.form-horizontal div input[type="text"]').each(function () {
+        //form inputs
+        $(".single-line").each(function () {
             if ($(this).val().trim() == "") {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
@@ -250,18 +248,41 @@
             }
 
         })
-
-        $('.form-horizontal div input[type="text"]').each(function () {
+        //numeric input
+        $(".form-horizontal div input[type='number']").each(function () {
             if ($(this).val().trim() == "" || $(this).val() <= 0) {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
             } else {
                 SwapClass($(this).parent(), "has-error", "has-success");
             }
-
         });
+
+        //WYSWYG input
+        if ($summernote.code()=="") {
+            flag = false;
+            if (!$('.alert-danger').length) {
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
+            } else {
+                $('.alert-danger').remove();
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
+            }
+        } else {
+            SwapClass($(this).parents(), "has-error", "has-success");
+        }
+        //Genre selector
+        if ($("#slct2").val() == null) {
+            flag = false;
+            if (!$('.alert-danger').length) { 
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
+            } else {
+                $('.alert-danger').remove();
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
+            }
+        } 
         return flag;
     }
+
     function SwapClass(ThisText, ClassR, ClassA) {
         $(ThisText).removeClass(ClassR);
         $(ThisText).addClass(ClassA);
