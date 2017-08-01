@@ -7,10 +7,14 @@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
 <!-- Select JavaScript -->
 <link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/select2/js/select2.min.js"></script>
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
 <style>
     .Error {
@@ -24,6 +28,7 @@
 <script>
     $(document).ready(function () {
 
+        //<!--DataTables  Initialization -- >
         $table = $('#datatable').DataTable({
             responsive: true,
             "columnDefs": [{
@@ -32,7 +37,7 @@
             }]
         });
 
-        
+        //<!--Select Initialization -- >
         $("#selectStatus").select2({
             placeholder: "Select a genre",
             allowClear: true
@@ -43,6 +48,14 @@
             allowClear: true
         });
 
+        $summernote = $(".summernote").summernote({
+            height: 150,   //set editable area's height
+            codemirror: { // codemirror options
+                theme: 'monokai'
+            }
+        });
+
+        //<--Event jQuery -->
         $("#btnSave").click(function () {
             createBook();
         });
@@ -64,7 +77,7 @@
             $("#closeDeleteModal").click();
         })
 
-
+        //<--Get ajax -->
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/getStatutes",
@@ -168,22 +181,23 @@
             var obj = {
 
                 Title: $("#Title").val(),
-                Description: $("#Description").val(),
+                Description: $summernote.code(),
                 ImageUrl: $("#ImageUrl").val(),
                 Publisher: $("#Publisher").val(),
                 PublicationYear: $("#PublicationYear").val(),
+                GenreIds: $("#selectGenre").val(),
+                StatusId: $("#selectStatus").val(),
                 Authors:authorList
 
             }
             AddBook(obj);
         }
-        else { ValidateMyAlert("Class='alert alert-warning'", 'emty slot', 'Warning') }
+        else { ValidateMyAlert("Class='alert alert-warning'", 'empty slot :c', 'Warning') }
 
     }
 
     function AddBook(obj) {
-
-
+      
         $.ajax({
             type: "POST",
             url: "http://localhost:61232/Books/AddNewBook",
@@ -232,10 +246,12 @@
     function validateMyForm() {
         var cellEmpty = true;
 
-        $("input[type='text']:not(.HiddenIndex , .HiddenIndexx)").each(function () {
+        $(".inputText").each(function () {
             if ($(this).val().trim() == "") {
+                console.log($(this));
                 changeClass($(this).parent(), "has-success", "has-error");
                 cellEmpty = false;
+                console.log("soy el 1");
             }
 
             else { changeClass($(this).parent(), "has-error", "has-success"); }
@@ -255,13 +271,19 @@
         $("select[class='form-control'").each(function () {
 
             if ($(this).val() == null) {
-                console.log("soy null");
                 changeClass($(this).parent(), "has-success", "has-error");
                 cellEmpty = false;
             }
             else { changeClass($(this).parent(), "has-error", "has-success"); }
 
         });
+
+        if ($summernote.code().trim() == "<p><br></p>") {
+            changeClass($(this).parent(), "has-success", "has-error");
+            cellEmpty = false;
+            console.log("summernote empty");
+        }
+        else { changeClass($(this).parent(), "has-error", "has-success"); }
 
         return cellEmpty;
     }
@@ -289,7 +311,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control inputText" } })
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -297,15 +319,15 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })*@
+                <textarea id="summernoteId " class="summernote"></textarea>
             </div>
         </div>
 
         <div class="form-group">
             @Html.LabelFor(model => model.ImageUrl, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control inputText" } })
                 @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -313,7 +335,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Publisher, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control inputText" } })
                 @Html.ValidationMessageFor(model => model.Publisher, "", new { @class = "text-danger" })
             </div>
         </div>

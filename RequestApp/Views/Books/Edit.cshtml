@@ -12,6 +12,12 @@
 <link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/select2/js/select2.min.js"></script>
 
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
 <style>
     .Error {
         border: solid 1px red;
@@ -23,6 +29,7 @@
 <Script>
     $(document).ready(function () {
 
+        //<!--DataTables  Initialization -- >
         $table = $('#datatable').DataTable({
             responsive: true,
             "columnDefs": [{
@@ -31,7 +38,7 @@
             }]
         });
 
-
+        //<!--Select Initialization -- >
         $("#selectStatus").select2({
             placeholder: "Select a genre",
             allowClear: true
@@ -40,6 +47,14 @@
         $("#selectGenre").select2({
             placeholder: "Select a genre",
             allowClear: true
+        });
+
+        //<!--summernote Initialization -- >
+        $summernote = $(".summernote").summernote({
+            height: 150,   //set editable area's height
+            codemirror: { // codemirror options
+                theme: 'monokai'
+            }
         });
 
 
@@ -105,7 +120,7 @@
                 console.log(data);
                 $("BookId").val(data.BookId);
                 $("#Title").val(data.Title);
-                $("#Description").val(data.Description);
+                $summernote.code(data.Description);
                 $("#ImageUrl").val(data.ImageUrl);
                 $("#Publisher").val(data.Publisher);
                 $("#PublicationYear").val(data.PublicationYear);
@@ -130,7 +145,7 @@
             SaveEditeRow(bookId);
         });
 
-
+        //<---------------model to delete------------------->
         $("#yesDelete").click(function () {
 
             $table.row($("#HiddenIndexDelete").val()).remove().draw();
@@ -142,9 +157,10 @@
             $("#closeDeleteModal").click();
         })
 
-    });
+    }); /*<---End document.ready-->*/
 
 
+     //<---------------options datatable------------------->
     function AddAuthors() {
 
         if (validateMyModal()) {
@@ -195,7 +211,7 @@
         }
     }
 
-
+    //<//---------------button Save book-------------------//>
     function SaveEditeRow (bookId)
     {
         console.log($("#Title").val());
@@ -215,10 +231,12 @@
                 data: JSON.stringify({
                     BookId: bookId,
                     Title: $("#Title").val(),
-                    Description: $("#Description").val(),
+                    Description: $summernote.code(),
                     ImageUrl: $("#ImageUrl").val(),
                     Publisher: $("#Publisher").val(),
                     PublicationYear: $("#PublicationYear").val(),
+                    GenreIds: $("#selectGenre").val(),
+                    StatusId: $("#selectStatus").val(),
                     Authors: authorList
                 }),
                 dataType: "json",
@@ -301,6 +319,12 @@
 
         });
 
+        if ($summernote.code().trim() == "<p><br></p>") {
+            changeClass($(this).parent(), "has-success", "has-error");
+            cellEmpty = false;
+        }
+        else { changeClass($(this).parent(), "has-error", "has-success"); }
+
         return cellEmpty;
     }
 
@@ -337,8 +361,8 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })*@
+                <textarea id="summernoteId " class="summernote"></textarea>
             </div>
         </div>
 
