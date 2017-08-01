@@ -116,7 +116,6 @@
         });
 
         $("#btnSave").click(function () {
-            console.log(validateMyForm());
             if (validateMyForm() && validateMyDTable()) {
 
                 var authors = [];
@@ -130,11 +129,11 @@
                     }
 
                     authors.push(authorObj);
-                }); 
+                });
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
-                    data: JSON.stringify({ 
+                    data: JSON.stringify({
                         Title: $("#Title").val(),
                         Description: $summernote.code(),
                         ImageUrl: $("#ImageUrl").val(),
@@ -146,7 +145,7 @@
                     }),
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
-                    success: function (Data) { 
+                    success: function (Data) {
                         if (Data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
@@ -158,7 +157,7 @@
                     }
                 });
             }
-        }); 
+        });
 
         $('#btnEdit').click(function () {
             if (validateMyModalForm()) {
@@ -202,7 +201,7 @@
     }
 
     function validateMyForm() {
-        var flag = true; 
+        var flag = true;
         //form inputs
         $(".single-line").each(function () {
             if ($(this).val().trim() == "") {
@@ -214,14 +213,13 @@
 
         })
         //numeric input
-        $(".form-horizontal div input[type='number']").each(function () {
-            if ($(this).val().trim() == "" || $(this).val() <= 0) {
-                SwapClass($(this).parent(), "has-success", "has-error");
-                flag = false;
-            } else {
-                SwapClass($(this).parent(), "has-error", "has-success");
-            } 
-        });
+        var numericI = ($("#PublicationYear").val()).trim();
+        if (numericI == "" || numericI <= 0) {
+            SwapClass($("#PublicationYear").parent(), "has-success", "has-error");
+            flag = false;
+        } else {
+            SwapClass($("#PublicationYear").parent(), "has-error", "has-success");
+        }
 
         //WYSWYG input
         if ($summernote.code() == "") {
@@ -232,11 +230,9 @@
                 $('.alert-danger').remove();
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
             }
-        } else {
-            SwapClass($(this).parents(), "has-error", "has-success");
         }
         //Genre selector
-        if ($("#slct2").val() == null) {
+        if ($("#select2").val() == null) {
             flag = false;
             if (!$('.alert-danger').length) {
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
@@ -249,18 +245,17 @@
     }
 
     function validateMyDTable() {
-        if ($eDTable != null) {
-            if ($eDTable.data().length <= 0) {
-                if (!$('.alert-danger').length) {
-                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
-                } else {
-                    $('.alert-danger').remove();
-                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
-                }
-                flag = false;
+        var flag = true;
+        if ($vDTable.data().length <= 0) {
+            if (!$('.alert-danger').length) {
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
+            } else {
+                $('.alert-danger').remove();
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
             }
-            return flag;
-        } 
+            flag = false;
+        }
+        return flag;
     }
 
 
@@ -320,7 +315,7 @@
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
                 <textarea id="DescriptionSummernote" class="summernote"></textarea>
             </div>
         </div>
