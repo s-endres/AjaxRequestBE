@@ -8,6 +8,10 @@
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
+<!-- Select JavaScript -->
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/select2/js/select2.min.js"></script>
+
 <style>
     .Error {
         border: solid 1px red;
@@ -49,55 +53,7 @@
         }
 
         var bookId = $.urlParam("variable");
-        console.log(bookId);
 
-
-
-        $.ajax({
-            type: "GET",
-            url: "http://localhost:61232/Books/getSingleBook",
-            data: { BookId: bookId},
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (data) {
-                console.log(data);
-                    $("BookId").val(data.BookId);
-                    $("#Title").val(data.Title);
-                    $("#Description").val(data.Description);
-                    $("#ImageUrl").val(data.ImageUrl);
-                    $("#Publisher").val(data.Publisher);
-                    $("#PublicationYear").val(data.PublicationYear);
-                    console.log(data);
-                    $.each(data.Authors, function (index, item) {
-                        var array = [item.FirstName, item.SecondName, item.FirstLastName, item.SecondLastName, "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
-                        $table.row.add(array).draw();
-                        console.log(item);
-                        //$("div.id_100 select").val("val2").trigger("change");
-                    });
-
-            },
-
-            error: function () {
-                alert("stephan te falle :c");
-            }
-
-        });
-
-        $("#btnEdit").click(function () {
-            SaveEditeRow(bookId);
-        });
-
-
-        $("#yesDelete").click(function () {
-
-            $table.row($("#HiddenIndexDelete").val()).remove().draw();
-
-            var tableLength = $table.data().length;
-            if (tableLength == 0) {
-                $("#btnSave").prop("disabled", true);
-            }
-            $("#closeDeleteModal").click();
-        })
 
 
         $.ajax({
@@ -126,7 +82,7 @@
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
-                console.log(data);
+
                 $.each(data, function (index, item) {
                     $("#selectGenre").append("<option value=" + item.GenreId + ">" + item.Name + "</option>");
                 });
@@ -138,6 +94,53 @@
 
         });
 
+
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getSingleBook",
+            data: { BookId: bookId},
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                console.log(data);
+                $("BookId").val(data.BookId);
+                $("#Title").val(data.Title);
+                $("#Description").val(data.Description);
+                $("#ImageUrl").val(data.ImageUrl);
+                $("#Publisher").val(data.Publisher);
+                $("#PublicationYear").val(data.PublicationYear);
+                $("#selectStatus").val(data.StatusId).trigger('change');
+                $("#selectGenre").val(data.GenreIds).trigger('change');
+               
+                $.each(data.Authors, function (index, item) {
+                    var array = [item.FirstName, item.SecondName, item.FirstLastName, item.SecondLastName, "<button type=\"button\"  data-toggle='modal' data-target='#DeleteModal' class=\"glyphicon glyphicon-trash\" onclick = \"removeRow((this))\"></button> <button type=\"button\" data-toggle=\"modal\" data-target=\"#myModal\" onclick =\"editRow((this))\" class = \"glyphicon glyphicon-pencil\">"];
+                    $table.row.add(array).draw();
+
+                });
+
+            },
+
+            error: function () {
+                alert("stephan te falle :c");
+            }
+
+        });
+
+        $("#btnEdit").click(function () {
+            SaveEditeRow(bookId);
+        });
+
+
+        $("#yesDelete").click(function () {
+
+            $table.row($("#HiddenIndexDelete").val()).remove().draw();
+
+            var tableLength = $table.data().length;
+            if (tableLength == 0) {
+                $("#btnSave").prop("disabled", true);
+            }
+            $("#closeDeleteModal").click();
+        })
 
     });
 
@@ -291,10 +294,10 @@
 
             if ($(this).val() == null) {
                 console.log("soy null");
-                changeClass($(this).parent(), "has-success", "has-error");
+                changeClass($(this).parent("div .form-group"), "has-success", "has-error");
                 cellEmpty = false;
             }
-            else { changeClass($(this).parent("div"), "has-error", "has-success"); }
+            else { changeClass($(this).parent("div .form-group"), "has-error", "has-success"); }
 
         });
 
