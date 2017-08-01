@@ -278,10 +278,9 @@
 
         });
 
-        if ($summernote.code().trim() == "<p><br></p>") {
+        if ($summernote.val().trim() == "") {
             changeClass($(this).parent(), "has-success", "has-error");
             cellEmpty = false;
-            console.log("summernote empty");
         }
         else { changeClass($(this).parent(), "has-error", "has-success"); }
 
