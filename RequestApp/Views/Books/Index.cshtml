@@ -45,11 +45,11 @@
                     if (data) {
                         Index.remove().draw();
                     } else {
-                        AddRemove("Alert", "Error", "No me borré");
+                        AddRemove("Alert", "Error");
                     }
                 },
                 error: function () {
-                    AddRemove("Error", "Alert", "Me caí");
+                    AddRemove("Error", "Alert");
                 }
             });
         });
@@ -112,10 +112,10 @@
         $("#modalDelete").modal('show');
     });
 
-    function AddRemove(idAdd, idRemove, Text) {
+    function AddRemove(idAdd, Text) {
         if (!$("#" + idAdd).length) {
-            $("#" + idRemove).remove();
-            $("#myDT").before('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>' + Text + '</div >');
+            $(".alert").remove();
+            $(".form-horizontal").prepend('<div class="alert alert-danger" id="' + idAdd + '"><strong>Warning! </strong>' + Text + '</div >');
         }
     }
 

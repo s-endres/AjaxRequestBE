@@ -19,6 +19,13 @@
 <link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/select2/js/select2.min.js"></script>
 
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
 <h2>Edit</h2>
 <style>
     #hidden, #deleteHidden {
@@ -44,6 +51,8 @@
                 }
             ]
         });
+
+        $Summernote = $("#Description").summernote();
 
         $.get("http://localhost:61232/Books/getStatutes", function (data) {
             for (var i = 0; i < data.length; i++) {
@@ -90,7 +99,7 @@
                 } else {
                     console.log(data);
                     $("#Title").val(data.Title);
-                    $("#Description").val(data.Description);
+                    $("#Description").code(data.Description);
                     $("#ImageUrl").val(data.ImageUrl);
                     $("#Publisher").val(data.Publisher);
                     $("#PublicationYear").val(data.PublicationYear);
@@ -129,7 +138,7 @@
         });
 
         $("#btnEdit").click(function () {
-            if (Validate(".form-horizontal") && ValidateTable() && validateSelect()) {
+            if (Validate(".form-horizontal") && ValidateTable() && validateSelect() && validateTextArea()) {
                 $.ajax({
                     type: "PUT",
                     url: "http://localhost:61232/Books/UpdateBook",
@@ -195,7 +204,7 @@
 
     function Validate(Zone) {
         var validation = true;
-        $(Zone + " .form-control").not("#hidden").not("#deleteHidden").not("#Select1").not("#Select2").each(function () {
+        $(Zone + " .formControlClass").not("#hidden").not("#deleteHidden").not("#Select1").not("#Select2").each(function () {
             if ($(this).val().trim() == '' || $(this).val() < 0) {
                 $(this).addClass("Error");
                 validation = false;
@@ -265,6 +274,14 @@
         }
         return validate;
     }
+
+    function validateTextArea() {
+        if ($("#Description").code() == "<p><br></p>") {
+            AddRemove("DescriptionAlert", "Empty description");
+            return false;
+        }
+        return true;
+    }
 </Script>
 
 @using (Html.BeginForm())
@@ -280,7 +297,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control formControlClass" } })
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -288,7 +305,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                <textarea id="Description"></textarea>
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -296,7 +313,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ImageUrl, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control formControlClass" } })
                 @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -304,7 +321,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Publisher, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control formControlClass" } })
                 @Html.ValidationMessageFor(model => model.Publisher, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -312,7 +329,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.PublicationYear, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.PublicationYear, new { htmlAttributes = new { @class = "form-control formControlClass" } })
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -360,21 +377,21 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label for="IdFirstInput">First Name:</label>
-                            <input type="text" class="form-control" id="IdFirstInput">
+                            <input type="text" class="form-control formControlClass" id="IdFirstInput">
                         </div>
                         <div class="form-group">
                             <label for="IdSecondInput">Second Name:</label>
-                            <input type="text" class="form-control" id="IdSecondInput">
+                            <input type="text" class="form-control formControlClass" id="IdSecondInput">
                         </div>
                         <div class="form-group">
                             <label for="IdThirdInput">Last Name:</label>
-                            <input type="text" class="form-control" id="IdThirdInput">
+                            <input type="text" class="form-control formControlClass" id="IdThirdInput">
                         </div>
                         <div class="form-group">
                             <label for="IdFourthInput">Surname:</label>
-                            <input type="text" class="form-control" id="IdFourthInput">
+                            <input type="text" class="form-control formControlClass" id="IdFourthInput">
                         </div>
-                        <input type="text" class="form-control" id="hidden">
+                        <input type="text" class="form-control formControlClass" id="hidden">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
