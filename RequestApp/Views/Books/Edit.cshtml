@@ -52,7 +52,9 @@
             ]
         });
 
-        $Summernote = $("#Description").summernote();
+        $Summernote = $("#Description").summernote({
+            height: 150
+        });
 
         $.get("http://localhost:61232/Books/getStatutes", function (data) {
             for (var i = 0; i < data.length; i++) {

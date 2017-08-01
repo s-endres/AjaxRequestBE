@@ -51,7 +51,9 @@
             ]
         });
 
-        $Summernote = $("#Description").summernote();
+        $('.summernote').summernote({
+            height: 150
+        });
 
         $("#Select1").select2({
             placeholder: "Select a statuts",
@@ -259,7 +261,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <textarea id="Description"></textarea>
+                <textarea id="Description" class="summernote"></textarea>
             </div>
         </div>
 
