@@ -13,7 +13,7 @@
 <script src="/bower_components/summernote/js/summernote.min.js"></script>
 <!-- Custom Fonts -->
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
- 
+
 
 <h2>Edit</h2>
 
@@ -36,7 +36,7 @@
             ]
 
         });
-       
+
         $summernote = $(".summernote").summernote({
             height: 100
         });
@@ -73,7 +73,7 @@
             }
         });
 
-        
+
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/GetSingleBook",
@@ -90,8 +90,8 @@
                     $("#ImageUrl").val(Data.ImageUrl);
                     $("#Publisher").val(Data.Publisher);
                     $("#PublicationYear").val(Data.PublicationYear);
-                    $("#slct2").val(Data.GenreIds).trigger('change'); 
-                    $("#slct1").val(Data.StatusId).trigger('change'); 
+                    $("#slct2").val(Data.GenreIds).trigger('change');
+                    $("#slct1").val(Data.StatusId).trigger('change');
 
                     var AuthorsData = [];
                     for (var i = 0; i < Data.Authors.length; i++) {
@@ -122,7 +122,7 @@
 
         $("#slct1").select2({
             placeholder: "Select Status"
-        }); 
+        });
 
         $(document).on('click', '.glyphicon-folder-open', function () {
             $('.modal-body input[type="text"]').val("").parent().removeClass("has-success");
@@ -208,18 +208,16 @@
     function validateMyDTable() {
         var flag = true;
 
-        if ($eDTable != null) {
-            if ($eDTable.data().length <= 0) {
-                if (!$('.alert-danger').length) {
-                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
-                } else {
-                    $('.alert-danger').remove();
-                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
-                }
-                flag = false;
+        if ($eDTable.data().length <= 0) {
+            if (!$('.alert-danger').length) {
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
+            } else {
+                $('.alert-danger').remove();
+                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
             }
-            return flag;
-        } 
+            flag = false;
+        }
+        return flag;
     }
 
     function validateMyModalForm() {
@@ -259,7 +257,7 @@
         });
 
         //WYSWYG input
-        if ($summernote.code()=="") {
+        if ($summernote.code() == "") {
             flag = false;
             if (!$('.alert-danger').length) {
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
@@ -273,13 +271,13 @@
         //Genre selector
         if ($("#slct2").val() == null) {
             flag = false;
-            if (!$('.alert-danger').length) { 
+            if (!$('.alert-danger').length) {
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
             } else {
                 $('.alert-danger').remove();
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
             }
-        } 
+        }
         return flag;
     }
 
@@ -360,7 +358,7 @@
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
                 <textarea id="DescriptionSummernote" class="summernote"></textarea>
             </div>
         </div>
@@ -431,42 +429,42 @@
         </table>
     </div>
 
-        <div class="modal" id="myModal">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title" id="myModalHeadAdd">Author</h4>
-                    </div>
-                    <div id="myModalBody" class="modal-body">
-                        <form id="myModalForm">
-                            <div class="form-group">
-                                <label for="recipient-name" class="control-label">First Name:</label>
-                                <input type="text" class="form-control" id="firstInput">
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="control-label">Second Name:</label>
-                                <input type="text" class="form-control" id="secondInput">
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="control-label">LastName:</label>
-                                <input type="text" class="form-control" id="thirdInput">
-                            </div>
-                            <div class="form-group">
-                                <label for="message-text" class="control-label">Surname:</label>
-                                <input type="text" class="form-control" id="fourthInput">
-                            </div>
+    <div class="modal" id="myModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalHeadAdd">Author</h4>
+                </div>
+                <div id="myModalBody" class="modal-body">
+                    <form id="myModalForm">
+                        <div class="form-group">
+                            <label for="recipient-name" class="control-label">First Name:</label>
+                            <input type="text" class="form-control" id="firstInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">Second Name:</label>
+                            <input type="text" class="form-control" id="secondInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">LastName:</label>
+                            <input type="text" class="form-control" id="thirdInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="message-text" class="control-label">Surname:</label>
+                            <input type="text" class="form-control" id="fourthInput">
+                        </div>
 
-                            <input type="text" class="form-control" style="display:none" id="hiddenInput">
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" id="btnAdd" class="btn btn-primary" onclick="add()">Add Author</button>
-                        <button type="button" id="btnEdit2" class="btn btn-primary" style="display:none" onclick="edit()">Edit</button>
-                    </div>
+                        <input type="text" class="form-control" style="display:none" id="hiddenInput">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="btnClose" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" id="btnAdd" class="btn btn-primary" onclick="add()">Add Author</button>
+                    <button type="button" id="btnEdit2" class="btn btn-primary" style="display:none" onclick="edit()">Edit</button>
                 </div>
             </div>
         </div>
+    </div>
 
         <div>
             <div class="modal fade" id="myDeleteModal" role="checkbox">
