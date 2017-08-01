@@ -15,12 +15,17 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 <link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/select2/js/select2.min.js"></script>
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
 
 <h2>Create</h2>
 
 <script>
     $(document).ready(function () {
-
 
         $vDTable = $('#dTable').DataTable({
 
@@ -40,8 +45,12 @@
         });
 
         $("#select1").select2({
-            placeholder: "Select a genre",
+            placeholder: "Select",
             allowClear: true
+        });
+
+        $summernote = $(".summernote").summernote({
+            height: 100
         });
 
         $('tbody').on('click', '.glyphicon-trash', function () {
@@ -74,9 +83,8 @@
             $("#hiddenInput").val(index);
         })
 
-        $("#btnSave").click(function () {
-            console.log(validateMyForm());
-            if (validateMyForm() && validateMyDTable()) {
+        $("#btnSave").click(function () { 
+            if (validateMyDTable()) {
 
                 var authors = [];
 
@@ -89,23 +97,23 @@
                     }
 
                     authors.push(authorObj);
-                });
-
+                }); 
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
-                    data: JSON.stringify({
+                    data: JSON.stringify({ 
                         Title: $("#Title").val(),
-                        Description: $("#Description").val(),
+                        Description: $summernote.code(),
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
+                        Genre: $("#select2").val(),
+                        Status: $("#select1").val(),
                         Authors: authors
                     }),
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
-                    success: function (Data) {
-                        console.log(Data);
+                    success: function (Data) { 
                         if (Data) {
                             window.location.replace("http://localhost:61232/Books/");
                         } else {
@@ -194,8 +202,9 @@
     }
 
     function validateMyForm() {
-        var flag = true;
+        var flag = true; 
         $(".form-horizontal div input[type='text']").each(function () {
+            console.log($(this).val());
             if ($(this).val().trim() == "") {
                 SwapClass($(this).parent(), "has-success", "has-error");
                 flag = false;
@@ -211,27 +220,30 @@
                 flag = false;
             } else {
                 SwapClass($(this).parent(), "has-error", "has-success");
-            }
-
-           
+            } 
         });
+
+        if ($("#DescriptionSummernote").val().trim() == ""){
+            SwapClass($(this).parent(), "has-success", "has-error");
+            flag = false;
+        }else {
+            SwapClass($(this).parent(), "has-error", "has-success");
+        }
 
         if ($("#select2").val() == null) {
             if (!$('.alert-danger').length) {
                 flag = false;
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
             }
-        } else { 
+        } else {
             $('.alert-danger').remove();
         }
         return flag;
     }
 
     function validateMyDTable() {
-        var flag = true;
-        console.log($vDTable);
+        var flag = true; 
         if ($vDTable.data().length == 0) {
-        //if ($vDTable == null) {
             flag = false;
             if (!$('.alert-danger').length) {
                 $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Author is required</div>");
@@ -256,7 +268,7 @@
         return flag;
     }
 
-   
+
 
     function add() {
         if (validateMyModalForm()) {
@@ -298,8 +310,9 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
+                <textarea id="DescriptionSummernote" class="summernote"></textarea>
             </div>
         </div>
 

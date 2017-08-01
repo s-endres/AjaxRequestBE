@@ -8,6 +8,12 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 <link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/select2/js/select2.min.js"></script>
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+ 
 
 <h2>Edit</h2>
 
@@ -30,16 +36,11 @@
             ]
 
         });
-        $("#select2").select2({
-            placeholder: "Select a genre",
-            allowClear: true
+       
+        $summernote = $(".summernote").summernote({
+            height: 100
         });
-
-        $("#select1").select2({
-            placeholder: "Select a genre",
-            allowClear: true
-        });
-
+        
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/GetSingleBook",
@@ -52,10 +53,15 @@
                 if (Data) {
                     $("#BookId").val(Data.BookId);
                     $("#Title").val(Data.Title);
-                    $("#Description").val(Data.Description);
+                    $summernote.code(Data.Description);
                     $("#ImageUrl").val(Data.ImageUrl);
                     $("#Publisher").val(Data.Publisher);
                     $("#PublicationYear").val(Data.PublicationYear);
+                    $("#slct2").val(Data.GenreIds).trigger('change');
+                    console.log($("#slct2").val());
+                    $("#slct1").val(Data.StatusId).trigger('change');
+                    console.log($("#slct1").val());
+
                     var AuthorsData = [];
                     for (var i = 0; i < Data.Authors.length; i++) {
                         var AuthorsArray = [
@@ -78,6 +84,17 @@
             }
         });
 
+        $("#slct2").select2({
+            placeholder: "Select a Genre",
+            allowClear: true
+        });
+
+        $("#slct1").select2({
+            placeholder: "Select Status",
+            allowClear: true
+        });
+
+
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/getGenres",
@@ -86,7 +103,7 @@
             contentType: 'application/json; charset=utf-8',
             success: function (Data) {
                 $.each(Data, function () {
-                    $("#select2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
+                    $("#slct2").append("<option value='" + this.GenreId + "'>" + this.Name + "</option>");
                 });
             },
             error: function () {
@@ -102,7 +119,7 @@
             contentType: 'application/json; charset=utf-8',
             success: function (Data) {
                 $.each(Data, function () {
-                    $("#select1").append("<option value='" + this.SuccessId + "'>" + this.Name + "</option>");
+                    $("#slct1").append("<option value='" + this.SuccessId + "'>" + this.Name + "</option>");
                 });
             },
             error: function () {
@@ -125,7 +142,6 @@
             var rowIndex = $("#hiddenInput").val();
             $eDTable.row(rowIndex).remove().draw();
             console.log(rowIndex);
-            //$eDTable.row($(rowIndex).parents("tr")).remove().draw();
         });
 
         $('tbody').on('click', '.glyphicon-edit', function () {
@@ -143,7 +159,7 @@
         })
 
         $("#btnEdit").click(function () {
-            if (validateMyForm() && validateMyDTable()) {
+            if (validateMyDTable()) {
                 var AuthorsArray = [];
 
                 for (var i = 0; i < $eDTable.data().length; i++) {
@@ -164,7 +180,7 @@
                     data: JSON.stringify({
                         BookId: parseInt($.urlParam("BookId")),
                         Title: $("#Title").val(),
-                        Description: $("#Description").val(),
+                        Description: $summernote.code(),
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
@@ -322,8 +338,9 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })*@
+                <textarea id="DescriptionSummernote" class="summernote"></textarea>
             </div>
         </div>
 
@@ -354,14 +371,14 @@
         <div class="form-group">
             <label class="control-label col-md-2">Genre</label>
             <div class="col-md-10">
-                <select id="select2" class="form-control" multiple></select>
+                <select id="slct2" class="form-control" multiple></select>
             </div>
         </div>
 
         <div class="form-group">
             <label class="control-label col-md-2">Status</label>
             <div class="col-md-10">
-                <select id="select1" class="form-control"></select>
+                <select id="slct1" class="form-control"></select>
             </div>
         </div>
 
