@@ -222,23 +222,32 @@
         }
 
         //WYSWYG input
-        if ($summernote.code() == "") {
-            flag = false;
-            if (!$('.alert-danger').length) {
-                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
-            } else {
+        if (flag) {
+            if ($summernote.code() == "") {
+                flag = false;
+                if (!$('.alert-danger').length) {
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
+                } else {
+                    $('.alert-danger').remove();
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
+                }
+            }
+            else {
                 $('.alert-danger').remove();
-                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Description is required.</div>");
             }
         }
         //Genre selector
-        if ($("#select2").val() == null) {
-            flag = false;
-            if (!$('.alert-danger').length) {
-                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
+        if (flag) {
+            if ($("#select2").val() == null) {
+                flag = false;
+                if (!$('.alert-danger').length) {
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
+                } else {
+                    $('.alert-danger').remove();
+                    $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
+                }
             } else {
                 $('.alert-danger').remove();
-                $(".form-horizontal").append("<div class='alert alert-danger'><strong>Does not meet requirements. </strong>Genre is required.</div>");
             }
         }
         return flag;
