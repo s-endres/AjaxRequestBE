@@ -19,6 +19,11 @@
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <h2>Edit</h2>
 
 <Script>
@@ -30,6 +35,10 @@
             var results = new RegExp('[\?&]' + pName + '=([^&#]*)').exec(window.location.href);
             return results[1] || 0;
         }
+        $SummerNote = $("#Summernote").summernote({
+            height: 125,
+            codemirror: { theme: 'monokai' }
+        });
         BookObject = { BookId: $.urlParam("BookId") };
         $("tbody").on("click", ".glyphicon-ok-circle", function () {
             $("#AddRow").css("display", "none");
@@ -81,7 +90,7 @@
                         ]
                     $table.row.add(ArrayAuthors).draw()
                 }
-                $("#Description").val(Data.Description),
+                    $SummerNote.code(Data.Description),
                     $("#ImageUrl").val(Data.ImageUrl),
                     $("#PublicationYear").val(Data.PublicationYear),
                     $("#Publisher").val(Data.Publisher),
@@ -95,14 +104,14 @@
         $("#btnEdit").click(function () {
             JasonObject = {
                 BookId: $.urlParam("BookId"),
-                Description: $("#Description").val(),
+                Description: $SummerNote.code(),
                 ImageUrl: $("#ImageUrl").val(),
                 PublicationYear: $("#PublicationYear").val(),
                 Publisher: $("#Publisher").val(),
                 Title: $("#Title").val(),
                 Authors: GetAuthors()
             };
-            if (ValidateForm(".form-horizontal")) {
+            if (ValidateForm(".form-horizontal")||ValidateTextArea()) {
                 $.ajax({
                     type: "PUT",
                     url: "http://localhost:61232/Books/UpdateBook ",
@@ -164,7 +173,7 @@
     //-------------------FUNCTIONS SECTION-------------------//
     function ValidateForm(Zone) {
         var Error = true;
-        $(Zone + " .form-control").not("#hidden").each(function () {
+        $(Zone + " .NewOne").not("#hidden").each(function () {
             if ($(this).val().trim() == "" || $(this).val() < 0) {
                 $(this).addClass("Error");
                 Error = false;
@@ -198,7 +207,13 @@
         $("#AddRow").css("display", "inline");
         $(".modal-content .form-control").not(".hidden").not(".hidden2").val("");
     }//Opens up the modal cleaning the data
+    function ValidateTextArea() {
+        if ($SummerNote.val().trim() == "") {
+            $("#Summernote").addClass("Error");
+            $("#summernote").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a description >:v</div>');
+        }
 
+    }//Validates the text Area
 </Script>
 <style>
     #hidden {
@@ -230,15 +245,16 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
-        </div>
+        </div> 
 
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })*@
+                <textarea id="Summernote"></textarea>
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -246,7 +262,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ImageUrl, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -254,7 +270,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Publisher, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.Publisher, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -262,7 +278,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.PublicationYear, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.PublicationYear, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -307,19 +323,19 @@
                     <form role="form">
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> First Name</label>
-                            <input type="text" class="form-control" id="FirstName" placeholder="Enter First Value">
+                            <input type="text" class="form-control NewOne" id="FirstName" placeholder="Enter First Value">
                         </div>
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Name</label>
-                            <input type="text" class="form-control" id="SecondName" placeholder="Enter Second Value">
+                            <input type="text" class="form-control NewOne" id="SecondName" placeholder="Enter Second Value">
                         </div>
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> First Last Name</label>
-                            <input type="text" class="form-control" id="FirstLastName" placeholder="Enter Third Value">
+                            <input type="text" class="form-control NewOne" id="FirstLastName" placeholder="Enter Third Value">
                         </div>
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Last Name</label>
-                            <input type="text" class="form-control" id="SecondLastName" placeholder="Enter Fourth Value">
+                            <input type="text" class="form-control NewOne" id="SecondLastName" placeholder="Enter Fourth Value">
                         </div>
                         <input type="text" id="hidden">
                     </form>

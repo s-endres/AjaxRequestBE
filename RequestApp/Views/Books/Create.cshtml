@@ -20,6 +20,11 @@
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
 <link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/select2/js/select2.min.js"></script>
+<!-- Summernote -->
+<link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/summernote/js/summernote.min.js"></script>
+<!-- Custom Fonts -->
+<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <h2>Create</h2>
 
 <script>
@@ -34,53 +39,59 @@
             "order": [[1, "asc"]],
 
         });
-       $Select1 = $("#Select1").select2({
-            placeholder: "Select a genre",
-            allowClear: true
-        });
-        $Select2 = $("#Select2").select2({
-            placeholder: "Select Status",
-            allowClear: true
+
+
+        //$Select1 = $("#Select1").select2({
+        //    placeholder: "Select a genre",
+        //    allowClear: true
+        //});
+        //$Select2 = $("#Select2").select2({
+        //    placeholder: "Select Status",
+        //    allowClear: true
+        //});
+        $SummerNote = $("#Summernote").summernote({
+            height: 125,
+            codemirror: {theme:'monokai'}
         });
         //send object to the data so you can acces it with the ajax
-        $.ajax({
-            type: "GET",
-            url: "http://localhost:61232/Books/getGenres",
-            data: JSON.stringify({
-                Title: $("#Title").val(),
-                Description: $("#Description").val(),
-                ImageUrl: $("#ImageUrl").val(),
-                Publisher: $("#Publisher").val(),
-                PublicationYear: $("#PublicationYear").val(),
-                authors: AuthorsMethod()
-            }),
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (Pdata) {
-                if (Pdata) {
-                    window.location.replace("http://localhost:61232/Books/");
-                }
-                else {
+        //$.ajax({
+        //    type: "GET",
+        //    url: "http://localhost:61232/Books/getGenres",
+        //    data: JSON.stringify({
+        //        Title: $("#Title").val(),
+        //        Description: $("#Description").val(),
+        //        ImageUrl: $("#ImageUrl").val(),
+        //        Publisher: $("#Publisher").val(),
+        //        PublicationYear: $("#PublicationYear").val(),
+        //        authors: AuthorsMethod()
+        //    }),
+        //    dataType: "json",
+        //    contentType: 'application/json; charset=utf-8',
+        //    success: function (Pdata) {
+        //        if (Pdata) {
+        //            //window.location.replace("http://localhost:61232/Books/");
+        //        }
+        //        else {
 
-                    if (!$('div[class="alert-danger"]').length) {
-                        $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Failed inserting the data</div>');
-                    }
-                }
-            },
-            error: function () {
-                WarningMessage();
-            }
-        });
+        //            if (!$('div[class="alert-danger"]').length) {
+        //                $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Failed inserting the data</div>');
+        //            }
+        //        }
+        //    },
+        //    error: function () {
+        //        WarningMessage();
+        //    }
+        //});
         $("#btnSave").click(function () {
 
-            if (ValidateForm(".form-horizontal") || CheckDatable()) {
-            
+            if (ValidateForm(".form-horizontal") || CheckDatable() || ValidateTextArea()) {
+                console.log($SummerNote.code());
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
                     data: JSON.stringify({
                         Title: $("#Title").val(),
-                        Description: $("#Description").val(),
+                        Description: $SummerNote.code(),
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
@@ -90,7 +101,7 @@
                     contentType: 'application/json; charset=utf-8',
                     success: function (Pdata) {
                         if (Pdata) {
-                            window.location.replace("http://localhost:61232/Books/");
+                            //window.location.replace("http://localhost:61232/Books/");
                         }
                         else {
 
@@ -106,7 +117,8 @@
             }
         });//Closes POST Ajax method
         $("#AddRow").click(function () {
-            if (ValidateForm(".modal-body")) {
+            if(ValidateForm("#modal-body")) {
+                console.log("jaja salu2")
                 var Data = [
                     $("#FirstName").val(),
                     $("#SecondName").val(),
@@ -116,6 +128,7 @@
                     "<span class='glyphicon glyphicon-ok-circle'></span>"
 
                 ];
+                console.log(Data);
                 var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
 
                 $("#MainTable").DataTable()
@@ -124,6 +137,7 @@
                     .draw();
                 $("#myModal").modal("hide");
             }
+            
         });//Closes Add Row function
         $("#EditRow").click(function () {
             if (ValidateForm(".modal-body")) {
@@ -187,7 +201,7 @@
     }//Displays a warning message
     function ValidateForm(Zone) {
         var Error = true;
-        $(Zone + " .form-control").not("#hidden").each(function () {
+        $(Zone + " .NewOne").not("#hidden").each(function () {
             if ($(this).val().trim() == "" || $(this).val() < 0) {
                 $(this).addClass("Error");
                 Error = false;
@@ -198,6 +212,15 @@
         });
         return Error;
     }//Validates the form
+    function ValidateTextArea()
+    {
+        if ($SummerNote.val().trim() == "")
+        {
+            $("#Summernote").addClass("Error");
+            $("#summernote").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a description >:v</div>');
+        }
+        
+    }
     function CloseModal() {
         $("#myModal").modal("hide");
         $(".form-control").not(".Data").val("");
@@ -221,6 +244,7 @@
     }//Obtains the Authors information
     function CheckDatable()
     {
+
         if ($table.data().length === 0)
         {
             $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without an author >:v</div>');
@@ -250,14 +274,14 @@
 {
     @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
+    <div class="form-horizontal" id="form-horizontal">
         <h4>Book</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
             @Html.LabelFor(model => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -265,7 +289,8 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })*@
+                <textarea id="Summernote"></textarea>
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -273,7 +298,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.ImageUrl, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.ImageUrl, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.ImageUrl, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -281,7 +306,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.Publisher, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.EditorFor(model => model.Publisher, new { htmlAttributes = new { @class = "form-control NewOne" } })
                 @Html.ValidationMessageFor(model => model.Publisher, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -289,18 +314,18 @@
         <div class="form-group">
             @Html.LabelFor(model => model.PublicationYear, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control" />
+                <input type="number" id="PublicationYear" name="PublicationYear" class="form-control NewOne" />
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
-        <div class="form-group">
+        @*<div class="form-group">
             <label class="control-label col-md-2">Genre</label>
             <select class="form-control" id="Select1"></select>    
         </div>
         <div class="form-group">
             <label class="control-label col-md-2">Book Status</label>
             <select class="form-control" id="Select2"></select>
-        </div>
+        </div>*@
         <div>
             <div class="col-md-offset-2 col-md-10">
                 <input type="button" id="btnSave" value="Create" class="btn btn-default" />
@@ -338,23 +363,23 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4><span class="glyphicon glyphicon-add"></span> Add Authors Information :3</h4>
                 </div>
-                <div class="modal-body" style="padding:40px 50px;">
+                <div class="modal-body" id="modal-body" style="padding:40px 50px;">
                     <form role="form">
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> First Name</label>
-                            <input type="text" class="form-control" id="FirstName" placeholder="Enter First Value">
+                            <input type="text" class="form-control NewOne" id="FirstName" placeholder="Enter First Value">
                         </div>
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Name</label>
-                            <input type="text" class="form-control" id="SecondName" placeholder="Enter Second Value">
+                            <input type="text" class="form-control NewOne" id="SecondName" placeholder="Enter Second Value">
                         </div>
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> First Last Name</label>
-                            <input type="text" class="form-control" id="FirstLastName" placeholder="Enter Third Value">
+                            <input type="text" class="form-control NewOne" id="FirstLastName" placeholder="Enter Third Value">
                         </div>
                         <div class="form-group">
                             <label for="usrname"><span class="glyphicon glyphicon-user"></span> Second Last Name</label>
-                            <input type="text" class="form-control" id="SecondLastName" placeholder="Enter Fourth Value">
+                            <input type="text" class="form-control NewOne" id="SecondLastName" placeholder="Enter Fourth Value">
                         </div>
                         <input type="text" id="hidden">
                     </form>
