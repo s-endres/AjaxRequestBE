@@ -18,7 +18,8 @@
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
-
+<link href="/bower_components/select2/css/select2.min.css" rel="stylesheet" type="text/css">
+<script src="/bower_components/select2/js/select2.min.js"></script>
 <!-- Summernote -->
 <link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/summernote/js/summernote.min.js"></script>
@@ -35,6 +36,15 @@
             var results = new RegExp('[\?&]' + pName + '=([^&#]*)').exec(window.location.href);
             return results[1] || 0;
         }
+
+        $Select1 = $("#Select1").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });
+        $Select2 = $("#Select2").select2({
+            placeholder: "Select Status",
+            allowClear: true
+        });
         $SummerNote = $("#Summernote").summernote({
             height: 125,
             codemirror: { theme: 'monokai' }
@@ -75,12 +85,63 @@
         });//Confirmation Modal
         $.ajax({
             type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Pdata) {
+                if (Pdata) {
+                    $.each(Pdata, function () {                    
+                        $("#Select2").append("<option value=" + this.StatusId + ">" + this.Name + "</option>");
+                    })
+                }
+                else {
+
+                    if (!$('div[class="alert-danger"]').length) {
+                        $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Something went wrong</div>');
+                    }
+                }
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });//GET Ajax Status
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Pdata) {
+
+                if (Pdata) {
+
+                    $.each(Pdata, function () {
+                        
+                        $("#Select1").append("<option value=" + this.GenreId + ">" + this.Name + "</option>");
+                    })
+                }
+
+
+                else {
+
+                    if (!$('div[class="alert-danger"]').length) {
+                        $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Something went wrong</div>');
+                    }
+                }
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });//GET Ajax Genres
+        $.ajax({
+            type: "GET",
             url: "http://localhost:61232/Books/getSingleBook",
             data: BookObject,
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
             success: function (Data) {
-                console.log(Data);
+                
                 var DataArray = [];
                 var Authors = Data.Authors;
                 for (i = 0; i < Authors.length; i++) {
@@ -90,11 +151,14 @@
                         ]
                     $table.row.add(ArrayAuthors).draw()
                 }
-                    $SummerNote.code(Data.Description),
-                    $("#ImageUrl").val(Data.ImageUrl),
-                    $("#PublicationYear").val(Data.PublicationYear),
-                    $("#Publisher").val(Data.Publisher),
-                    $("#Title").val(Data.Title)
+                $SummerNote.code(Data.Description),
+                $("#ImageUrl").val(Data.ImageUrl),
+                $("#PublicationYear").val(Data.PublicationYear),
+                $("#Publisher").val(Data.Publisher),
+                $("#Title").val(Data.Title),
+                $("#Select1").val(Data.GenreIds).trigger('change');
+                $("#Select2").val(Data.StatusId).trigger('change');
+                    
 
             },
             error: function () {
@@ -109,9 +173,11 @@
                 PublicationYear: $("#PublicationYear").val(),
                 Publisher: $("#Publisher").val(),
                 Title: $("#Title").val(),
-                Authors: GetAuthors()
+                Authors: GetAuthors(),
+                GenreIds: $("#Select1").val(),
+                StatusId: $("Select2").val()
             };
-            if (ValidateForm(".form-horizontal")||ValidateTextArea()) {
+            if (ValidateForm(".form-horizontal") && CheckDatable() && ValidateTextArea() && ValidateSelect()) {
                 $.ajax({
                     type: "PUT",
                     url: "http://localhost:61232/Books/UpdateBook ",
@@ -207,13 +273,31 @@
         $("#AddRow").css("display", "inline");
         $(".modal-content .form-control").not(".hidden").not(".hidden2").val("");
     }//Opens up the modal cleaning the data
-    function ValidateTextArea() {
-        if ($SummerNote.val().trim() == "") {
-            $("#Summernote").addClass("Error");
-            $("#summernote").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a description >:v</div>');
+    function ValidateTextArea()
+    {
+        if ($SummerNote.val().trim() == "")
+        {
+            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a description >:v</div>');
+            return false;
         }
-
+        return true;
     }//Validates the text Area
+    function CheckDatable() {
+
+        if ($table.data().length === 0) {
+            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without an author >:v</div>');
+            return false;
+        }
+        return true;
+    }//Validates the Data Table
+    function ValidateSelect() {
+        if ($("#Select1").val() == null) {
+            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a genre >:O</div>');
+            return false;
+        }
+        return true;
+
+    }//Validates the select
 </Script>
 <style>
     #hidden {
@@ -254,7 +338,7 @@
             @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @*@Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })*@
-                <textarea id="Summernote"></textarea>
+                <textarea id="Summernote" ></textarea>
                 @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -282,7 +366,14 @@
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
-
+        <div class="form-group">
+            <label class="control-label col-md-2">Genre</label>
+            <select class="form-control" id="Select1" multiple></select>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">Book Status</label>
+            <select class="form-control" id="Select2"></select>
+        </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input type="button" value="Save" class="btn btn-default" id="btnEdit" />

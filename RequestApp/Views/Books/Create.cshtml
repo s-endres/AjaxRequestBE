@@ -38,53 +38,77 @@
             ],
             "order": [[1, "asc"]],
 
-        });
-
-
-        //$Select1 = $("#Select1").select2({
-        //    placeholder: "Select a genre",
-        //    allowClear: true
-        //});
-        //$Select2 = $("#Select2").select2({
-        //    placeholder: "Select Status",
-        //    allowClear: true
-        //});
+        });//Inicialize the Data Table
+        $Select1 = $("#Select1").select2({
+            placeholder: "Select a genre",
+            allowClear: true
+        });//Inicialize the select genre
+        $Select2 = $("#Select2").select2({
+            placeholder: "Select Status",
+            allowClear: true
+        });//Inicialize the select status
         $SummerNote = $("#Summernote").summernote({
             height: 125,
             codemirror: {theme:'monokai'}
-        });
-        //send object to the data so you can acces it with the ajax
-        //$.ajax({
-        //    type: "GET",
-        //    url: "http://localhost:61232/Books/getGenres",
-        //    data: JSON.stringify({
-        //        Title: $("#Title").val(),
-        //        Description: $("#Description").val(),
-        //        ImageUrl: $("#ImageUrl").val(),
-        //        Publisher: $("#Publisher").val(),
-        //        PublicationYear: $("#PublicationYear").val(),
-        //        authors: AuthorsMethod()
-        //    }),
-        //    dataType: "json",
-        //    contentType: 'application/json; charset=utf-8',
-        //    success: function (Pdata) {
-        //        if (Pdata) {
-        //            //window.location.replace("http://localhost:61232/Books/");
-        //        }
-        //        else {
+        });//Inicialize the Text Area
+        
+        
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getStatutes",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Pdata) {
+                if (Pdata) {
+                    $.each(Pdata, function () {
+                      
+                        $("#Select2").append("<option value=" + this.StatusId + ">" + this.Name + "</option>");
+                    })
+                }
+                else {
 
-        //            if (!$('div[class="alert-danger"]').length) {
-        //                $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Failed inserting the data</div>');
-        //            }
-        //        }
-        //    },
-        //    error: function () {
-        //        WarningMessage();
-        //    }
-        //});
+                    if (!$('div[class="alert-danger"]').length) {
+                        $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Something went wrong</div>');
+                    }
+                }
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });//GET Ajax Status
+        $.ajax({
+            type: "GET",
+            url: "http://localhost:61232/Books/getGenres",
+            data: "",
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (Pdata) {
+                
+                    if (Pdata)
+                    {
+
+                        $.each(Pdata, function () {
+                           
+                            $("#Select1").append("<option value=" + this.GenreId + ">" + this.Name + "</option>");
+                        })       
+                    }
+                         
+                
+                else {
+
+                    if (!$('div[class="alert-danger"]').length) {
+                        $(".form-group").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong>Something went wrong</div>');
+                    }
+                }
+            },
+            error: function () {
+                WarningMessage();
+            }
+        });//GET Ajax Genres
         $("#btnSave").click(function () {
 
-            if (ValidateForm(".form-horizontal") || CheckDatable() || ValidateTextArea()) {
+            if (ValidateForm(".form-horizontal") && CheckDatable() && ValidateTextArea() && ValidateSelect()) {
                 console.log($SummerNote.code());
                 $.ajax({
                     type: "POST",
@@ -95,13 +119,17 @@
                         ImageUrl: $("#ImageUrl").val(),
                         Publisher: $("#Publisher").val(),
                         PublicationYear: $("#PublicationYear").val(),
-                        authors: AuthorsMethod()
+                        authors: AuthorsMethod(),
+                        GenreIds: $("#Select1").val(),
+                        StatusId: $("#Select2").val()
                     }),
                     dataType: "json",
                     contentType: 'application/json; charset=utf-8',
                     success: function (Pdata) {
                         if (Pdata) {
-                            //window.location.replace("http://localhost:61232/Books/");
+                             window.location.replace("http://localhost:61232/Books/");
+                           
+                            
                         }
                         else {
 
@@ -214,13 +242,15 @@
     }//Validates the form
     function ValidateTextArea()
     {
+        
         if ($SummerNote.val().trim() == "")
         {
-            $("#Summernote").addClass("Error");
-            $("#summernote").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a description >:v</div>');
+            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a description >:v</div>');
+            return false;
         }
+        return true;
         
-    }
+    }//Validates the text Area
     function CloseModal() {
         $("#myModal").modal("hide");
         $(".form-control").not(".Data").val("");
@@ -248,8 +278,20 @@
         if ($table.data().length === 0)
         {
             $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without an author >:v</div>');
+            return false;
         }
-    }
+        return true;
+    }//Validates the Data Table
+    function ValidateSelect()
+    {
+        if ($("#Select1").val() == null)
+        {
+            $(".form-horizontal").prepend('<div class="alert alert-danger"><strong>Omaiga!</strong> You can insert a book without a genre >:O</div>');
+            return false;
+        }
+        return true;
+
+    }// Validates the select
 </script>
 
 
@@ -318,14 +360,14 @@
                 @Html.ValidationMessageFor(model => model.PublicationYear, "", new { @class = "text-danger" })
             </div>
         </div>
-        @*<div class="form-group">
+        <div class="form-group">
             <label class="control-label col-md-2">Genre</label>
-            <select class="form-control" id="Select1"></select>    
+            <select class="form-control" id="Select1" multiple></select>    
         </div>
         <div class="form-group">
             <label class="control-label col-md-2">Book Status</label>
             <select class="form-control" id="Select2"></select>
-        </div>*@
+        </div>
         <div>
             <div class="col-md-offset-2 col-md-10">
                 <input type="button" id="btnSave" value="Create" class="btn btn-default" />
