@@ -67,7 +67,7 @@
             return results[1] || 0;
         }
 
-        var bookId = $.urlParam("variable");
+        var bookId = $.urlParam("variable"); //no creer la variable global, solo local a donde la tienes q usar
 
 
 
@@ -98,8 +98,8 @@
             contentType: 'application/json; charset=utf-8',
             success: function (data) {
 
-                $.each(data, function (index, item) {
-                    $("#selectGenre").append("<option value=" + item.GenreId + ">" + item.Name + "</option>");
+                $.each(data, function (index, item) { //Si solo vas a usar el item, entonces no uses parametros y usas this para sacar el data
+                    $("#selectGenre").append("<option value=" + this.GenreId + ">" + item.Name + "</option>");
                 });
             },
 
@@ -218,7 +218,7 @@
         if (validateMyForm()) {
 
             var authorList = [];
-            $("tbody tr").each(function (value, index) {
+            $("tbody tr").each(function (value, index) { //index no lo usas
                 var rowIndex = $table.row(value).index();
                 var row = $table.row(rowIndex).data()
                 var obj = { FirstName: row[0], SecondName: row[1], FirstLastName: row[2], SecondLastName: row[3] }
