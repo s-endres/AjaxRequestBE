@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "Create";
 }
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
 
 <!-- MetisMenu CSS -->
@@ -23,13 +22,11 @@
 <!-- Summernote -->
 <link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/summernote/js/summernote.min.js"></script>
-<!-- Custom Fonts -->
-<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <h2>Create</h2>
 
 <script>
     $("document").ready(function () {
-        $table = $("#MainTable").DataTable({
+        $table = $("#MainTable").DataTable({ //Identa mejor tu codigo
 
             "columnDefs":
             [
@@ -64,7 +61,7 @@
                     $.each(Pdata, function () {
                       
                         $("#Select2").append("<option value=" + this.StatusId + ">" + this.Name + "</option>");
-                    })
+                    }) //Te faltan bastantes ;
                 }
                 else {
 
@@ -83,7 +80,7 @@
             data: "",
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
-            success: function (Pdata) {
+            success: function (Pdata) { //Identa tu codigo
                 
                     if (Pdata)
                     {
@@ -158,7 +155,7 @@
                 ];
                 console.log(Data);
                 var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
-
+                //La variable Obj no la usas en ningun lado
                 $("#MainTable").DataTable()
                     .row
                     .add(Data)
@@ -178,7 +175,7 @@
                     "<span class='glyphicon glyphicon-remove-circle'> |</span>" +
                     "<span class='glyphicon glyphicon-ok-circle'></span>"
                 ];
-                console.log(Data)
+                console.log(Data) // ;
                 $table
                     .row($("#hidden").val())
                     .data(Data)
@@ -203,7 +200,7 @@
         $("tbody").on("click", ".glyphicon-remove-circle", function () {
             var Row = $(this).parents("tr");
             var Index = $table.row(Row).index();
-            var Data = $table.row(Index).data();
+            var Data = $table.row(Index).data(); //Esta variable no la usas
             $("#hidden2").val(Index);
             console.log("jaja saludos");
             $("#myDeleteModal").modal();

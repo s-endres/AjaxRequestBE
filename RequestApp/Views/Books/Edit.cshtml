@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "Edit";
 }
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
 
 <!-- MetisMenu CSS -->
@@ -23,8 +22,6 @@
 <!-- Summernote -->
 <link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/summernote/js/summernote.min.js"></script>
-<!-- Custom Fonts -->
-<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 <h2>Edit</h2>
 
 <Script>
@@ -68,7 +65,7 @@
         $("tbody").on("click", ".glyphicon-remove-circle", function () {
             var Row = $(this).parents("tr");
             var Index = $table.row(Row).index();
-            var Data = $table.row(Index).data();
+            var Data = $table.row(Index).data(); // No usas esta variable
             $("#hidden2").val(Index);
             $("#myDeleteModal").modal();
 
@@ -112,7 +109,7 @@
             data: "",
             dataType: "json",
             contentType: 'application/json; charset=utf-8',
-            success: function (Pdata) {
+            success: function (Pdata) { //Identa mejor
 
                 if (Pdata) {
 
@@ -142,7 +139,7 @@
             contentType: 'application/json; charset=utf-8',
             success: function (Data) {
                 
-                var DataArray = [];
+                var DataArray = []; //No usas esta variable
                 var Authors = Data.Authors;
                 for (i = 0; i < Authors.length; i++) {
                     var ArrayAuthors =
@@ -166,7 +163,7 @@
             }
         });//Close GET Ajax
         $("#btnEdit").click(function () {
-            JasonObject = {
+            JasonObject = { //Esto es un objeto normal, no un JsonObject
                 BookId: $.urlParam("BookId"),
                 Description: $SummerNote.code(),
                 ImageUrl: $("#ImageUrl").val(),
@@ -227,7 +224,7 @@
                     "<span class='glyphicon glyphicon-ok-circle'></span>"
                 ];
                 var Obj = { FirstName: Data[0], SecondName: Data[1], FirstLastName: Data[2], SecondLastName: Data[3] };
-
+                //no usas la variable Obj
                 $("#MainTable").DataTable()
                     .row
                     .add(Data)
