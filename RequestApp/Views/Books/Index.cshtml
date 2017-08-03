@@ -3,8 +3,6 @@
 @{
     ViewBag.Title = "Index";
 }
-<!-- Bootstrap Core CSS -->
-@*<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">*@
 <!-- MetisMenu CSS -->
 <link href="/bower_components/metisMenu/dist/metisMenu.min.css" rel="stylesheet">
 <!-- DataTables CSS -->
@@ -13,7 +11,6 @@
 <link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
 <!-- Custom Fonts -->
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
@@ -57,7 +54,7 @@
 
         $('#myDT tbody').on('click', '.glyphicon-edit', function () {
             
-            var Input=$DTable.row($(this).parents('tr')).index();
+            var Input=$DTable.row($(this).parents('tr')).index();//Mejorar nombre de variable
             window.location.href = 'http://localhost:61232/Books/Edit?BookId=' + $DTable.row(Input).data().BookId;
         })
 
@@ -89,7 +86,7 @@
     }
 
     function format(datarow) {
-        var TRs = ""
+        var TRs = "" //; te faltan en bastante lados
         for (var i = 0; i < datarow.length; i++) {
             TRs += "<tr><td>" + datarow[i].FirstName + "</td><td>" + datarow[i].SecondName + "</td><td>" + datarow[i].FirstLastName + "</td><td>" + datarow[i].SecondLastName + "</td></tr>"
         }   
@@ -137,7 +134,7 @@
     }
 
     function setDropTable(row) {
-        var x;
+        var x; // no usas esta variable
         $.ajax({
             type: "GET",
             url: "http://localhost:61232/Books/getBookAuthors",
