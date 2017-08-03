@@ -11,7 +11,6 @@
 <link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
 <!-- Custom Fonts -->
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
@@ -86,7 +85,8 @@
             "processing": true,
             "data": data,
             "columns": [
-                { "data": "Hand"},
+                //{ "data": "Hand"}, //Usa defaults, asi no tienes q crear otra variable en el objeto
+                { "defaultContent": "<span class='glyphicon glyphicon-hand-right'></span>" },
                 { "data": "BookId" },
                 { "data": "Description" },
                 { "data": "ImageUrl" },

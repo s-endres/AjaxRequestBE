@@ -11,7 +11,6 @@
 <link href="/bower_components/datatables-responsive/css/dataTables.responsive.css" rel="stylesheet">
 <!-- Custom Fonts -->
 <link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- DataTables JavaScript -->
 <script src="/bower_components/datatables/media/js/jquery.dataTables.min.js"></script>
 <script src="/bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>
@@ -22,8 +21,6 @@
 <!-- Summernote -->
 <link href="/bower_components/summernote/css/summernote.css" rel="stylesheet" type="text/css">
 <script src="/bower_components/summernote/js/summernote.min.js"></script>
-<!-- Custom Fonts -->
-<link href="/bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
 <h2>Create</h2>
 <style>
@@ -97,7 +94,7 @@
             console.log($("#Select2").val());
             if (Validate(".form-horizontal") && ValidateTable() && validateSelect() && validateTextArea()) {
                 console.log($("#Description").val());
-                var Arreglo = GetAuthors();
+                var Arreglo = GetAuthors(); //Esta variable no la usas
                 $.ajax({
                     type: "POST",
                     url: "http://localhost:61232/Books/AddNewBook",
